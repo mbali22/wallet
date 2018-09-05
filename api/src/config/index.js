@@ -1,5 +1,7 @@
 export default {
-  "port": 3005,
-  "mongoUrl": "mongodb://localhost:27017/restaurant-api",
-  "bodyLimit": "100kb"
+  "port": 3005,  
+  "bodyLimit": "100kb",
+  "aws":{
+    "endpoint":"http:localhost:8000"    
+  }
 }
