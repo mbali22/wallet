@@ -1,9 +1,9 @@
-
+import aws from '../config/aws';
 
 
 export default class transactions {
   constructor(){
-      
+      let awsResource = new aws();
   }
 
   GetDashBoardInfo() {
