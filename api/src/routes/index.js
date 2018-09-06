@@ -6,7 +6,6 @@ const router = express();
 
 router.get('/', function (req, res) {
   debugger;
-  //res.json( { data:"this is a valid Data" } );
   walletController.getwalletTrans().then((responseData) => {
     res.json( { data:responseData } );
   }).catch(err => {
