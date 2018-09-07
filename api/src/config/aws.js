@@ -1,42 +1,87 @@
 import config from './index'
-var AWS = require('aws-sdk');
+const AWS = require('aws-sdk');
 
-const transactions = "transactions";
+
+//AWS Object
+AWS.config =  new AWS.Config({ accessKeyId: 'AKID', secretAccessKey: 'SECRET', region: 'us-west-2' });
+
+//DynamoDBObject
 const dynamoClient = new AWS.DynamoDB({endpoint:config.aws.endpoint});                            
-const dynamoScehma = {    
-       TableName : "transactions",
-       KeySchema: [       
-           { 
-               AttributeName: "Id", 
-               KeyType: "HASH", //Partition key
-           },
-           { 
-               AttributeName: "date", 
-               KeyType: "RANGE" //Sort key
-           }
-       ],
-       AttributeDefinitions: [
-           { 
-               AttributeName: "Id", 
-               AttributeType: "N"  
-           },
-           { 
-            AttributeName: "date", 
-            AttributeType: "S"  
-           }
-           
-       ],
-       ProvisionedThroughput: {       
-           ReadCapacityUnits: 1, 
-           WriteCapacityUnits: 1
-       }
-   
+
+const tables = {
+    "transactions" : "transactions",
+    "dashboard":"dashboard",
+    "persons":"persons",
+    "tranctionTypes":"tranctionTypes"
+}
+const tableSchemas = 
+    {
+    "transactionsSchema": {
+        TableName: tables["transactions"],
+        KeySchema: [
+            {
+                AttributeName: "Id",
+                KeyType: "HASH", //Partition key
+            },
+            {
+                AttributeName: "date",
+                KeyType: "RANGE" //Sort key
+            }
+        ],
+        AttributeDefinitions: [
+            {
+                AttributeName: "Id",
+                AttributeType: "N"
+            },
+            {
+                AttributeName: "date",
+                AttributeType: "S"
+            }
+
+        ],
+        ProvisionedThroughput: {
+            ReadCapacityUnits: 10,
+            WriteCapacityUnits: 10
+        }
+
+    },
+    "tranctionTypes":{
+        TableName: tables["tranctionTypes"],
+        KeySchema: [
+            {
+                AttributeName: "Id",
+                KeyType: "HASH", //Partition key
+            },
+            {
+                AttributeName: "value",
+                KeyType: "RANGE" //Sort key
+            }
+        ],
+        AttributeDefinitions: [
+            {
+                AttributeName: "Id",
+                AttributeType: "N"
+            },
+            {
+                AttributeName: "value",
+                AttributeType: "S"
+            }
+
+        ],
+        ProvisionedThroughput: {
+            ReadCapacityUnits: 10,
+            WriteCapacityUnits: 10
+        }
+
+    }
 };
+
+
 
 
 export default class AWSResource {  
     constructor()  {
-        AWS.config =  new AWS.Config({ accessKeyId: 'AKID', secretAccessKey: 'SECRET', region: 'us-west-2' });
+        
     }
           
     
