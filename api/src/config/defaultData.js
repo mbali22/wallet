@@ -1,5 +1,6 @@
-import 
-const defaultData = {
+import csv from 'csvtojson';
+import {  } from "./cred.csv";  
+const defaultData = { 
     "transactionTypes":[
         {
             "id":1,
@@ -75,7 +76,8 @@ const defaultData = {
     "transactions":[]
 }
 
-function ReadTransactionsFromCSV(){
+function LoadTransactionsFromCSV(){
+    let csvFilePath = require('./cred.csv');
   
 }
 

@@ -1,16 +1,3 @@
-amount	date	reason	PersonId	type
-3300	2011-06-22	mobile emi	1	1
-9500	2012-06-22	mobile emi	2	1
-10000	2012-10-22	loan taken for site registration	2	1
-40000	2016-02-10	credit card usage 	2	1
-20000	2017-02-10	online transfer on demand	3	1
-17000	2018-02-10	loan transferred online	4	1
-6000	2018-04-10	loan transferred online	5	1
-3000	2015-04-10	Loan	6	1
-7500	2014-11-29	Amazon purchase	7	1
-10000	2017-04-29	loan taken	8	1
--6000	2018-08-10	repaid 6000	6	2
-24202	2018-08-11	Mobile purchase at Paytm	6	1
-5000	2018-08-17	Paytm wallet transfer	6	1
--15000	2017-11-17	taken Marriage expense	9	3
-10000	2018-02-17	Marriage expense repaid	9	4
+amount,date,reason,PersonId,type
+3300,2011-06-22,mobile emi,1,1
+

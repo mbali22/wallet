@@ -1,16 +1,17 @@
-import aws from '../config/aws';
+import {InitaliZeDbWithDefaualtData} from '../config/aws';
 
 
-export default class transactions {
+export default class transactions { 
   constructor(){     
-  }
+  } 
 
   GetDashBoardInfo() {
     return new Promise((resolve,reject) => {   
-      let awsResource = new aws();   
-      awsResource.createDynamoSchema().then(data => {
+      //let awsResource = new aws();
+      //awsResource.createDynamoSchema().then(data => {
+      InitaliZeDbWithDefaualtData().then(data => {
           resolve(data);
-      }).catch(err => {
+      }).catch(err => { 
           reject(err);
       });
     });    
