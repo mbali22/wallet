@@ -1,5 +1,4 @@
 import csv from 'csvtojson';
-import {  } from "./cred.csv";  
 const defaultData = { 
     "transactionTypes":[
         {
@@ -75,11 +74,5 @@ const defaultData = {
     ],
     "transactions":[]
 }
-
-function LoadTransactionsFromCSV(){
-    let csvFilePath = require('./cred.csv');
-  
-}
-
 
 export {defaultData};

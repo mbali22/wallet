@@ -2,7 +2,7 @@ import config from './index'
 const AWS = require('aws-sdk');
 import { defaultData } from "./defaultData";
 import async from 'async';
-import csv from 'csvtojson';
+var csv = require('csvtojson');
 import path from 'path';
 
 //AWS Object
@@ -71,10 +71,9 @@ let getPersons = new Promise((resolve,reject) => {
 let getTransactions = new Promise((resolve,reject) => {
         try
         {
-            let filePath = path.resolve(__dirname,'cred.csv');        
+            let filePath = path.resolve(__dirname,'cred.csv');            
             csv({trim:true,output:'json'}).fromFile(filePath) 
-                .then((jsonObj) => {
-                    console.log(jsonObj);                  
+                .then((jsonObj) => {                    
                     resolve({"transactions":jsonObj});
             });
         }
@@ -104,7 +103,7 @@ function InitaliZeDbWithDefaualtData () {
             });
             if(dashboardInfo){
                 resolve(dashboardInfo);
-            }
+            } 
             else{
                 reject(null);
             }
