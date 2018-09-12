@@ -1,4 +1,4 @@
-import {InitaliZeDbWithDefaualtData} from '../config/aws';
+import {InitaliZeDbWithDefaualtData} from '../database/initializeDb';
 
 
 export default class transactions { 
@@ -6,10 +6,8 @@ export default class transactions {
   } 
 
   GetDashBoardInfo() {
-    return new Promise((resolve,reject) => {   
-      //let awsResource = new aws();
-      //awsResource.createDynamoSchema().then(data => {
-      InitaliZeDbWithDefaualtData().then(data => {
+    return new Promise((resolve,reject) => {         
+      InitaliZeDbWithDefaualtData().then(data => {        
           resolve(data);
       }).catch(err => { 
           reject(err);

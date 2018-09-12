@@ -1,4 +1,4 @@
-import csv from 'csvtojson';
+
 const defaultData = { 
     "transactionTypes":[
         {
@@ -27,49 +27,49 @@ const defaultData = {
             "id":1,
             "fname":"Sanjay",
             "lname":"Dc",
-            "Contact Number":"9741732305"
+            "Mobile":"9741732305"
         },
         {
             "id":2,
             "fname":"Harish",
             "lname":"Rasalkar",
-            "Contact Number":"9449543777"
+            "Mobile":"9449543777"
         },
         {
             "id":3,
             "fname":"Sandeep",
             "lname":"Bhavikatti",            
-            "Contact Number":"919740515544"
+            "Mobile":"919740515544"
         },
         {
             "id":4,
             "fname":"Pradeep",
             "lname":"Hotti",
-            "Contact Number":"9448538916"
+            "Mobile":"9448538916"
         },
         {
             "id":5,
             "fname":"ShahiKumar",
             "lname":"MS",
-            "Contact Number":"9980256827"
+            "Mobile":"9980256827"
         },
         {
             "id":6,
             "fname":"Sharanaiah",
             "lname":"Hiremath",
-            "Contact Number":"7406627780"
+            "Mobile":"7406627780"
         },
         {
             "id":7,
             "fname":"Subhash",
             "lname":"Patil",
-            "Contact Number":"9964460038"
+            "Mobile":"9964460038"
         },
         {
             "id":8,
             "fname":"Iliyaz",
             "lname":"a",
-            "Contact Number":"9620150622"
+            "Mobile":"9620150622"
         }
     ],
     "transactions":[]
