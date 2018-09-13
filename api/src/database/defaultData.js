@@ -2,24 +2,24 @@
 const defaultData = { 
     "transactionTypes":[
         {
-            "id":1,
-            "value":"L20"
+            "id": 1,
+            "value": "L20"
         },
         {
-            "id":2,
-            "value":"LR0"
+            "id": 2,
+            "value": "LR0"
         },
         {
-            "id":3,
-            "value":"LT0"
+            "id": 3,
+            "value": "LT0"
         },
         {
-            "id":4,
-            "value":"LRP"
+            "id": 4,
+            "value": "LRP"
         },
         {
-            "id":5,
-            "value":"transaction"
+            "id": 5,
+            "value": "transaction"
         }
     ],
     "persons":[
@@ -70,7 +70,14 @@ const defaultData = {
             "fname":"Iliyaz",
             "lname":"a",
             "Mobile":"9620150622"
-        }
+        },
+        {
+            "id":9,
+            "fname":"Mutturaj",
+            "lname":"Bali",
+            "Mobile":"9945322284"
+        },
+
     ],
     "transactions":[]
 }
