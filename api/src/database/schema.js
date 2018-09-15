@@ -12,10 +12,10 @@ const tableSchemas =
     "dashboard":{
             TableName: tables["dashboard"],
             KeySchema: [
-                {AttributeName: "dashBoardId", KeyType: "HASH"}            
+                {AttributeName: "personId", KeyType: "HASH"}            
             ],
             AttributeDefinitions: [
-                { AttributeName: "dashBoardId",AttributeType: "N"}            
+                { AttributeName: "personId",AttributeType: "N"}            
             ],
             ProvisionedThroughput: {
                 ReadCapacityUnits: 10,WriteCapacityUnits: 10
@@ -39,10 +39,10 @@ const tableSchemas =
     "tranctionTypes":{
         TableName: tables["tranctionTypes"],
         KeySchema: [
-            {AttributeName: "Id", KeyType: "HASH"}  
+            {AttributeName: "id", KeyType: "HASH"}  
         ],
         AttributeDefinitions: [
-            { AttributeName: "Id",AttributeType: "N"}
+            { AttributeName: "id",AttributeType: "N"}
         ],
         ProvisionedThroughput: {
             ReadCapacityUnits: 10,WriteCapacityUnits: 10
@@ -51,9 +51,12 @@ const tableSchemas =
     "persons":{
         TableName: tables["persons"],
         KeySchema: [
-            {AttributeName: "id", KeyType: "HASH"}   
+            {AttributeName: "belongsTo", KeyType: "HASH"},
+            {AttributeName: "id",KeyType: "RANGE"}
+
         ],
         AttributeDefinitions: [
+            { AttributeName: "belongsTo",AttributeType: "N"},
             { AttributeName: "id",AttributeType: "N"}            
         ],
         ProvisionedThroughput: {
@@ -100,7 +103,7 @@ function createDynamoDBTable(table) {
         }
     });
 }
-export {CreateDBScehma};
+export {CreateDBScehma,tables};
 
 
 

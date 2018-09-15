@@ -4,5 +4,6 @@ export default {
   "aws":{
     "endpoint":"http://localhost:8000",
     "region":"ap-south-1"    
-  }
+  },
+  "putRetry":2
 }

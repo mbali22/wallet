@@ -2,7 +2,8 @@ import http from 'http';
 import express from 'express';
 import bodyParser from 'body-parser';
 import config from './config';
-import routes from './routes';
+import transactions from './routes/transactions';
+import person from "./routes/person";
 
 let app = express();
 app.server = http.createServer(app);
@@ -16,10 +17,11 @@ app.use(bodyParser.json({
 // passport config
 
 // api routes v1
-app.use('/', routes);
+app.use('/transactions', transactions);
+app.use('/persons', person);
 
 app.server.listen(config.port);
 
-console.log(`Started on port ${app.server.address().port}`);
+console.log(`Started on port ${app.server.address().port}`); 
 
 export default app;

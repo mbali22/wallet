@@ -1,7 +1,6 @@
 
 import { defaultData } from "./defaultData";
-import async from 'async';
-var csv = require('csvtojson');
+var csv = require('csvtojson/v2');
 import path from 'path';
 import { CreateDBScehma } from "./schema";
 
