@@ -66,11 +66,10 @@ const tableSchemas =
     
 };
 
-function CreateDBScehma() {
+function createDBScehma() {
     return new Promise((resolve, reject) => {
         let promises= []; let tableResults = [];
-        //resolve(Object.keys(tables));
-        //async.forEach(Object.keys(tables),(table) => {            
+        //resolve(Object.keys(tables));                    
         Object.keys(tables).forEach((table) => {
             promises.push(
                 createDynamoDBTable(table).then(data => {
@@ -80,10 +79,11 @@ function CreateDBScehma() {
                 })
             );
         });
-        Promise.all(promises).then(() => {
+        Promise.all(promises).then((tableResults) => {
             resolve(tableResults);
+        }).catch(error => {
+            reject(error);
         });
-        
     });
 }
 
@@ -103,7 +103,7 @@ function createDynamoDBTable(table) {
         }
     });
 }
-export {CreateDBScehma,tables};
+export {createDBScehma,tables};
 
 
 

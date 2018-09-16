@@ -4,9 +4,8 @@ import personRepo from "../model/person";
 class personController {
 
     getAllPersons(req) {
-        return new Promise((resolve, reject) => {
-            //resolve(typeof(personRepo.getPersonsById()));
-            personRepo.getPersonsById(id).then(data => {
+        return new Promise((resolve, reject) => {            
+            personRepo.getPersonsById().then(data => {
                 resolve(data);
             }).catch(err => {
                 reject(err);
@@ -15,7 +14,7 @@ class personController {
     }
 
     addPerson(req) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {                    
             personRepo.addPerson().then(data => {
                 resolve(data);
             }).catch(err => {

@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import config from './config';
 import transactions from './routes/transactions';
 import person from "./routes/person";
+import init from './routes/initialize';
 
 let app = express();
 app.server = http.createServer(app);
@@ -16,7 +17,8 @@ app.use(bodyParser.json({
 
 // passport config
 
-// api routes v1
+//routes for different section of app
+app.use('/', init);
 app.use('/transactions', transactions);
 app.use('/persons', person);
 
