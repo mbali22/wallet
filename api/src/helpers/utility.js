@@ -19,6 +19,21 @@ const utility = {
     },
     getuniqueId : function(){
         return (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+    },
+    getDbFormatColumn: function(type,value){
+        let formattedValue;
+        switch (type) {
+            case "N":
+                formattedValue = { "N": value };
+                break;
+
+            case "S":
+                formattedValue = { "S": value };
+                break;
+
+            default:
+                break;
+        }
     }
 }
 

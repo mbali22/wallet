@@ -13,6 +13,7 @@ router.get('/', function (req, res) {
 })
 
 router.post('/', function (req, res) {
+    
     person.addPerson(req).then((responseData) => {
         res.json({ data: responseData });
     }).catch(err => {
@@ -35,6 +36,7 @@ router.post('/', function (req, res) {
 //         res.status(500).json({ error: err });
 //     });
 // });
+
 
 
 export default router;

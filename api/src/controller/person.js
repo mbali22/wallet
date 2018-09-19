@@ -14,8 +14,9 @@ class personController {
     }
 
     addPerson(req) {
-        return new Promise((resolve, reject) => {                    
-            personRepo.addPerson().then(data => {
+        return new Promise((resolve, reject) => {       
+            let person  = getPersonRequestFromBody(req);
+            personRepo.addPerson(person).then(data => {
                 resolve(data);
             }).catch(err => {
                 reject(err);
@@ -25,5 +26,7 @@ class personController {
 
 
 }
-
+function getPersonRequestFromBody(req){
+    return req.body;
+}
 export default new personController();

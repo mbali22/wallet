@@ -79,10 +79,10 @@ function createDBScehma() {
                 })
             );
         });
-        Promise.all(promises).then((tableResults) => {
+        Promise.all(promises).then(() => {
             resolve(tableResults);
         }).catch(error => {
-            reject(error);
+            reject(tableResults);
         });
     });
 }
