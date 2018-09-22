@@ -7,6 +7,9 @@ function pad(number) {
 }
 
 const utility = {
+    parseToInt: (number) => {
+        return parseInt(number);
+    },
     FormatToISO8601: function (date) {
         return date.getFullYear() +
             '-' + pad(date.getMonth() + 1) +

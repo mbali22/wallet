@@ -1,4 +1,4 @@
-import { dynamoClient } from "../config/awsResources";
+import { dynamo } from "../config/awsResources";
 import async from 'async';
 
 const tables = {
@@ -71,6 +71,7 @@ function createDBScehma() {
         let promises= []; let tableResults = [];
         //resolve(Object.keys(tables));                    
         Object.keys(tables).forEach((table) => {
+            console.log(table);
             promises.push(
                 createDynamoDBTable(table).then(data => {
                     tableResults.push(data);
@@ -91,11 +92,13 @@ function createDBScehma() {
 function createDynamoDBTable(table) {
     return new Promise((resolve, reject) => {
         try {
-            dynamoClient.createTable(tableSchemas[table], function (err, data) {
-                if (err)
+            dynamo.createTable(tableSchemas[table], function (err, data) {
+                if (err) {                
                     reject({[table] :err});
-                else
+                }
+                else {                
                     resolve({[table] :data});
+                }
             });
         }
         catch (error) {

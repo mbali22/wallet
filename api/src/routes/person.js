@@ -4,7 +4,7 @@ import person from '../controller/person';
 
 const router = express();
 //routes for handling person related
-router.get('/', function (req, res) {
+router.get('/:personId', function (req, res) {
     person.getAllPersons(req).then((responseData) => {
         res.json({ data: responseData });
     }).catch(err => {
@@ -12,8 +12,7 @@ router.get('/', function (req, res) {
     });
 })
 
-router.post('/', function (req, res) {
-    
+router.post('/', function (req, res) {    
     person.addPerson(req).then((responseData) => {
         res.json({ data: responseData });
     }).catch(err => {

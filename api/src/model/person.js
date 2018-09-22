@@ -1,26 +1,35 @@
 import { defaultData } from "../database/defaultData";
 import { dynamoClient } from "../config/awsResources";
 import { tables } from "../database/schema";
+import { parseToInt } from "../helpers/utility";
 
 
 class personRepo {
 
     getPersonsById(personId){
        return new Promise((resolve,reject) => {
-            resolve('list of persons');
+            let getParams = this.getParamsForDb(personId);
+            dynamoClient.query(getParams, function(err, data) {
+               if(err){
+                    reject(err);
+               }else{
+                    resolve(data);
+               }            
+            });
        }); 
     }
 
     addPerson(person) {       
-        return new Promise((resolve, reject) => {               
-            resolve(person);
-            let newPerson = this.getPutParamsForDb(person);
-            docClient.put(newPerson, function(err, data) {
+        return new Promise((resolve, reject) => {                           
+            let newPerson = this.putParamsForDb(person);
+            //resolve(newPerson);
+            dynamoClient.put(newPerson, function(err, data) {
                 if (err){
+                    err.status = "failed";
                     reject(err);
                 }
                 else{
-                    
+                    resolve({"status":"success"});
                 }
             });
         });
@@ -33,12 +42,20 @@ class personRepo {
 
 
     //Util functions
-    getPutParamsForDb(item){
+    putParamsForDb(person){
+
+        if(person.id){
+            person.id = parseInt(person.id)
+        }
+        if(person.belongsTo){
+            person.belongsTo = parseInt(person.belongsTo)
+        }
+
         var params = {
             TableName: tables["persons"],
-            Item:item,
+            Item:person,
             ConditionExpression: 'attribute_not_exists(belongsTo) AND attribute_not_exists(id)',           
-            ReturnValues: 'NONE', // optional (NONE | ALL_OLD)
+            ReturnValues: 'ALL_OLD', // optional (NONE | ALL_OLD)
         };
         return params;
     }
@@ -51,7 +68,7 @@ class personRepo {
                 '#whose': 'belongsTo'
             },
             ExpressionAttributeValues: { // a map of substitutions for all attribute values
-              ':value': personId
+              ':value': parseInt(personId)
             }
         };
         return params;
