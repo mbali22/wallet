@@ -15,9 +15,31 @@ class personController {
     }
 
     addPerson(req) {
-        return new Promise((resolve, reject) => {            
+        return new Promise((resolve, reject) => {
+            let persons = getPersonFromRequestBody(req);
+            
+            if (Array.isArray(persons)) {                
+                personRepo.addMultiplePersons(persons).then(data => {
+                    resolve(data);
+                }).catch(err => {
+                    reject(err);
+                });
+            }
+
+            if (typeof(persons) === 'object') {                
+                personRepo.addPerson(persons).then(data => {
+                    resolve(data);
+                }).catch(err => {
+                    reject(err);
+                });
+            }
+        });
+    }
+
+    updatePerson(req) {
+        return new Promise((resolve, reject) => {                   
             let person  = getPersonFromRequestBody(req);            
-            personRepo.addPerson(person).then(data => {
+            personRepo.updatePerson(person).then(data => {
                 resolve(data);
             }).catch(err => {
                 reject(err);
@@ -25,9 +47,20 @@ class personController {
         });
     }
 
+    deletePerson(req) {
+        return new Promise((resolve, reject) => {                   
+            let deletPerson = getPersonFromRequestBody(req);
+            personRepo.deletePerson(deletPerson).then(data => {
+                resolve(data);
+            }).catch(err => {
+                reject(err);
+            });
+        });
+    }
 
 }
-function getPersonFromRequestBody(req){
+
+function getPersonFromRequestBody(req){    
     return req.body;
 }
 export default new personController();

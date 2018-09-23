@@ -1,5 +1,6 @@
 import express from 'express';
 import person from '../controller/person';
+import { resolve } from 'dns';
 
 
 const router = express();
@@ -12,7 +13,7 @@ router.get('/:personId', function (req, res) {
     });
 })
 
-router.post('/', function (req, res) {    
+router.post('/', function (req, res) {
     person.addPerson(req).then((responseData) => {
         res.json({ data: responseData });
     }).catch(err => {
@@ -20,21 +21,21 @@ router.post('/', function (req, res) {
     });
 });
 
-// router.put('/person', function (req, res) {
-//     walletController.getwalletTrans().then((responseData) => {
-//         res.json({ data: responseData });
-//     }).catch(err => {
-//         res.status(500).json({ error: err });
-//     });
-// });
+router.put('/', function (req, res) {    
+    person.updatePerson(req).then((responseData) => {
+        res.json({ data: responseData });
+    }).catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
 
-// router.delete('/person', function (req, res) {
-//     walletController.getwalletTrans().then((responseData) => {
-//         res.json({ data: responseData });
-//     }).catch(err => {
-//         res.status(500).json({ error: err });
-//     });
-// });
+router.delete('/', function (req, res) {
+    person.deletePerson(req).then((responseData) => {
+        res.json({ data: responseData });
+    }).catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
 
 
 
