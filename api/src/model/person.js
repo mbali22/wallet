@@ -27,10 +27,9 @@ class personRepo {
 
     insertPersonToDB(person) {
         return new Promise((resolve, reject) => {
-            //resolve(uuid());
             let id = uuid();
-            //person.id = null;
-            person.id = id;
+            //resolve(id);
+            person.id = id
             resolve(person);
             let newPerson = this.putParamsForDb(person);
             dynamoClient.put(newPerson, function (err, data) {
@@ -49,7 +48,7 @@ class personRepo {
         return new Promise((resolve, reject) => {
             let addedPersons = []; let promises = [];
             persons.forEach(person => {                
-                promises.push(this.addPerson(person).then(data => {
+                promises.push(this.insertPersonToDB(person).then(data => {
                     addedPersons.push(data);
                 }).catch(err => {
                     addedPersons.push(err);
