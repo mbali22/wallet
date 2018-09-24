@@ -27,20 +27,19 @@ class personRepo {
 
     insertPersonToDB(person) {
         return new Promise((resolve, reject) => {
-            let id = uuid();
-            //resolve(id);
-            person.id = id
+            person.id = uuid();
+            person.belongsTo = "4e709030-bfd1-11e8-be0a-3995b72fb62b";
             resolve(person);
-            let newPerson = this.putParamsForDb(person);
-            dynamoClient.put(newPerson, function (err, data) {
-                if (err) {
-                    err.status = "failed";
-                    reject(err);
-                }
-                else {
-                    resolve({ "status": "success", "response":data });
-                }
-            });
+            // let newPerson = this.putParamsForDb(person);
+            // dynamoClient.put(newPerson, function (err, data) {
+            //     if (err) {
+            //         err.status = "failed";
+            //         reject(err);
+            //     }
+            //     else {
+            //         resolve({ "status": "success", "response":data });
+            //     }
+            // });
         });
     }
 
@@ -48,13 +47,13 @@ class personRepo {
         return new Promise((resolve, reject) => {
             let addedPersons = []; let promises = [];
             persons.forEach(person => {                
-                promises.push(this.insertPersonToDB(person).then(data => {
+                promises.push(this.insertPersonToDB(person).then(data => {                    
                     addedPersons.push(data);
                 }).catch(err => {
                     addedPersons.push(err);
                 }));
             });
-            Promise.all(promises).then(() => {
+            Promise.all(promises).then(() => {                
                 resolve(addedPersons);
             });
         });
@@ -133,7 +132,7 @@ class personRepo {
                 '#whose': 'belongsTo'
             },
             ExpressionAttributeValues: { // a map of substitutions for all attribute values
-              ':value': parseInt(personId)
+              ':value': personId
             }
         };
         return params;
