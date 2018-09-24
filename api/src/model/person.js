@@ -8,7 +8,7 @@ class personRepo {
 
     getPersonsById(personId){
        return new Promise((resolve,reject) => {
-            let getParams = this.getParamsForDb(personId);
+            let getParams = this.getParamsForDb(personId);            
             dynamoClient.query(getParams, function(err, data) {
                if(err){
                     reject(err);
@@ -28,18 +28,20 @@ class personRepo {
     insertPersonToDB(person) {
         return new Promise((resolve, reject) => {
             person.id = uuid();
-            person.belongsTo = "4e709030-bfd1-11e8-be0a-3995b72fb62b";
-            resolve(person);
-            // let newPerson = this.putParamsForDb(person);
-            // dynamoClient.put(newPerson, function (err, data) {
-            //     if (err) {
-            //         err.status = "failed";
-            //         reject(err);
-            //     }
-            //     else {
-            //         resolve({ "status": "success", "response":data });
-            //     }
-            // });
+            
+            if(person.type && person.type === "admin"){
+                person.belongsTo = person.id;
+            }            
+            let newPerson = this.putParamsForDb(person);            
+            dynamoClient.put(newPerson, function (err, data) {
+                if (err) {
+                    err.status = "failed";
+                    reject(err);
+                }
+                else {
+                    resolve({ "status": "success", "response":data });
+                }
+            });
         });
     }
 
@@ -106,14 +108,7 @@ class personRepo {
 
 
     //Util functions
-    putParamsForDb(person){
-
-        if(person.id){
-            person.id = parseInt(person.id)
-        }
-        if(person.belongsTo){
-            person.belongsTo = parseInt(person.belongsTo)
-        }
+    putParamsForDb(person){       
 
         var params = {
             TableName: tables["persons"],
