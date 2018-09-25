@@ -1,3 +1,5 @@
+import { dynamoClient } from "../config/awsResources";
+import { tables } from "../database/schema";
 
 const defaultData = { 
     "transactionTypes":[
@@ -23,72 +25,92 @@ const defaultData = {
         }
     ],
     "persons":[
-        {
-            "id":1,
+        {            
             "fname":"Sanjay",
             "lname":"Dc",
             "Mobile":"9741732305",
-            "belongsTo":9
+            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
         },
         {
-            "id":2,
-            "fname":"Harish",
+          
+            "fname":"Harish", 
             "lname":"Rasalkar",
             "Mobile":"9449543777",
-            "belongsTo":9
+            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
         },
         {
-            "id":3,
+           
             "fname":"Sandeep",
             "lname":"Bhavikatti",            
             "Mobile":"919740515544",
-            "belongsTo":9
+            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
         },
         {
-            "id":4,
+           
             "fname":"Pradeep",
             "lname":"Hotti",
             "Mobile":"9448538916",
-            "belongsTo":9
+            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
         },
         {
-            "id":5,
+           
             "fname":"ShahiKumar",
             "lname":"MS",
             "Mobile":"9980256827",
-            "belongsTo":9
+            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
         },
         {
-            "id":6,
+           
             "fname":"Sharanaiah",
             "lname":"Hiremath",
             "Mobile":"7406627780",
-            "belongsTo":9
+            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
         },
         {
-            "id":7,
+           
             "fname":"Subhash",
             "lname":"Patil",
             "Mobile":"9964460038",
-            "belongsTo":9
+            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
         },
         {
-            "id":8,
+           
             "fname":"Iliyaz",
             "lname":"a",
             "Mobile":"9620150622",
-            "belongsTo":9
+            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
         },
         {
-            "id":9,
+           
             "fname":"Mutturaj",
             "lname":"Bali",
-            "Mobile":"9945322284",
-            "belongsTo":9
-        },
-
+            "Mobile":"9945322284",            
+            "type":"admin"
+        }
     ],
     "transactions":[]
+
+}
+
+function addTransactionType(){
+
+
+}
+
+function addMultipleTransactionTypes(persons) {
+    return new Promise((resolve, reject) => {
+        let addedPersons = []; let promises = [];
+        persons.forEach(person => {                
+            promises.push(this.addTransaction(transactionType).then(data => {                    
+                addedPersons.push(data);
+            }).catch(err => {
+                addedPersons.push(err);
+            }));
+        });
+        Promise.all(promises).then(() => {                
+            resolve(addedPersons);
+        });
+    });
 }
 
 export {defaultData};

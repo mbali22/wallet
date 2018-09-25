@@ -103,12 +103,8 @@ class personRepo {
 
 
 
-
-
-
-
     //Util functions
-    putParamsForDb(person){       
+    putParamsForDb(person){      
 
         var params = {
             TableName: tables["persons"],

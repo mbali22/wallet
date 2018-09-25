@@ -3,69 +3,40 @@ import personRepo from "../model/person";
 
 class personController {
 
-    async getAllPersons(req) {
-        //return new Promise((resolve, reject) => {
+    async getAllPersons(req) {        
             let personId = req.params.personId;
             let result =  await personRepo.getPersonsById(personId);
-            return result;
-            // personRepo.getPersonsById(personId).then(data => {
-            //     resolve(data);
-            // }).catch(err => {
-            //     reject(err);
-            // });
-        //});
+            return result;         
     }
 
-    async addPerson(req) {
-      //  return new Promise((resolve, reject) => {
-            let persons = getPersonFromRequestBody(req);
-            
+    async addPerson(req) {      
+            let persons = this.getPersonFromRequestBody(req);            
             if (Array.isArray(persons)) {   
                 let result = await personRepo.addMultiplePersons(persons);
-                return result;
-                // personRepo.addMultiplePersons(persons).then(data => {                    
-                //     resolve(data);
-                // }).catch(err => {
-                //     reject(err);
-                // });
+                return result;               
             }
             else if (typeof(persons) === 'object') {  
                 let result = await personRepo.addPerson(persons);
-                return result;
-                // personRepo.addPerson(persons).then(data => {
-                //     resolve(data);
-                // }).catch(err => {
-                //     reject(err);
-                // });
-            }
-        //});
+                return result;                
+            }        
     }
 
-    updatePerson(req) {
-        return new Promise((resolve, reject) => {                   
-            let person  = getPersonFromRequestBody(req);            
-            personRepo.updatePerson(person).then(data => {
-                resolve(data);
-            }).catch(err => {
-                reject(err);
-            });
-        });
+    async updatePerson(req) {       
+            let person  = this.getPersonFromRequestBody(req);            
+            let result = await personRepo.updatePerson(person);
+            return result;        
     }
 
-    deletePerson(req) {
-        return new Promise((resolve, reject) => {                   
-            let deletPerson = getPersonFromRequestBody(req);
-            personRepo.deletePerson(deletPerson).then(data => {
-                resolve(data);
-            }).catch(err => {
-                reject(err);
-            });
-        });
+    async deletePerson(req) {       
+            let deletPerson = this.getPersonFromRequestBody(req);
+            let result = await personRepo.deletePerson(deletPerson);      
+    }    
+    
+    //Utility funcitons 
+    getPersonFromRequestBody(req){    
+        return req.body;
     }
-
 }
 
-function getPersonFromRequestBody(req){    
-    return req.body;
-}
+
 export default new personController();
