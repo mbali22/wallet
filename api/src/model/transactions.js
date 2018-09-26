@@ -3,6 +3,7 @@ import { defaultData } from "../database/defaultData";
 import { dynamoClient } from "../config/awsResources";
 import { tables } from "../database/schema";
 import uuid from "uuid/v1";
+import { FormatToISO8601 } from "../helpers/utility";
 
 class transactionsRepo {
   constructor() {
@@ -16,9 +17,20 @@ class transactionsRepo {
 
   }
 
-  InsertTransactionToDb(){
-
-  }
+  insertTransactionToDb(transaction){
+    return new Promise((resolve, reject) => {
+      let newTransaction = this.putParamsForDb(transaction);            
+      dynamoClient.put(newTransaction, function (err, data) {
+          if (err) {
+              err.status = "failed";
+              reject(err);
+          }
+          else {
+              resolve({ "status": "success", "response":data });
+          }
+      });
+  });      
+}
 
   AddMultipleTransaction(transactions) {
 
@@ -34,25 +46,28 @@ class transactionsRepo {
 
   //Util functions
   putParamsForDb(transaction) {
-
+     if(transaction){
+       transaction.date = FormatToISO8601(transaction.date);
+       transaction.modifiedDate = FormatToISO8601(new Date());       
+     }
     var params = {
       TableName: tables["transactions"],
       Item: person,
-      ConditionExpression: 'attribute_not_exists(PersonId) AND attribute_not_exists(date)',
+      ConditionExpression: 'attribute_not_exists(personId) AND attribute_not_exists(date)',
       ReturnValues: 'ALL_OLD', // optional (NONE | ALL_OLD)
     };
     return params;
   }
 
-  getParamsForDb(personId) {
+  getParamsForDb(transaction) {
     var params = {
-      TableName: tables["persons"],
+      TableName: tables["transactions"],
       KeyConditionExpression: '#whose = :value',
       ExpressionAttributeNames: {
-        '#whose': 'belongsTo'
+        '#whose': 'personId'
       },
-      ExpressionAttributeValues: { // a map of substitutions for all attribute values
-        ':value': personId
+      ExpressionAttributeValues: { 
+        ':value': transaction.personId
       }
     };
     return params;
@@ -60,10 +75,10 @@ class transactionsRepo {
 
   updateParamsForDb(person) {
     var params = {
-      TableName: tables["persons"],
+      TableName: tables["transactions"],
       Key: {
-        "belongsTo": person.belongsTo,
-        "id": person.id
+        "personId": person.personId,
+        "date": person.date
       },
       UpdateExpression: 'SET fname = :fname, lname = :lname, Mobile = :Mobile',
       ConditionExpression: 'attribute_exists(belongsTo) AND attribute_exists(id)',

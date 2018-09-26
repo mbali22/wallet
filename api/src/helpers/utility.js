@@ -10,7 +10,7 @@ const utility = {
     parseToInt: (number) => {
         return parseInt(number);
     },
-    FormatToISO8601: function (date) {
+    FormatToISO8601: (date) => {
         return date.getFullYear() +
             '-' + pad(date.getMonth() + 1) +
             '-' + pad(date.getDate()) +

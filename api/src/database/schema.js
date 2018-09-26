@@ -24,11 +24,11 @@ const tableSchemas =
     "transactions": {
         TableName: tables["transactions"],
         KeySchema: [
-            { AttributeName: "PersonId", KeyType: "HASH"}, //Partition key 
+            { AttributeName: "personId", KeyType: "HASH"}, //Partition key 
             {AttributeName: "date",KeyType: "RANGE"}
         ],
         AttributeDefinitions: [
-            {AttributeName: "PersonId", AttributeType: "N"},
+            {AttributeName: "personId", AttributeType: "S"},
             {AttributeName: "date",AttributeType: "S"}
         ],
         ProvisionedThroughput: {
