@@ -92,25 +92,40 @@ const defaultData = {
 
 }
 
-function addTransactionType(){
-
-
-}
-
-function addMultipleTransactionTypes(persons) {
+function addTransactionType(transactionType) {
     return new Promise((resolve, reject) => {
-        let addedPersons = []; let promises = [];
-        persons.forEach(person => {                
-            promises.push(this.addTransaction(transactionType).then(data => {                    
-                addedPersons.push(data);
-            }).catch(err => {
-                addedPersons.push(err);
-            }));
-        });
-        Promise.all(promises).then(() => {                
-            resolve(addedPersons);
+        var params = {
+            TableName: tables["transactionTypes"],
+            Item: transactionType,
+            ConditionExpression: 'attribute_not_exists(id)',
+            ReturnValues: 'ALL_OLD', // optional (NONE | ALL_OLD)
+        };
+        dynamoClient.put(params, function (err, data) {
+            if (err) {
+                err.status = "failed";
+                reject(err);
+            }
+            else {
+                resolve({ "status": "success", "response": data });
+            }
         });
     });
 }
 
-export {defaultData};
+function addMultipleTransactionTypes() {
+    return new Promise((resolve) => {        
+        let promises = []; let trTypes = [];
+         defaultData.transactionTypes.forEach(transactionType => {                
+            promises.push(addTransactionType(transactionType).then(data => {                    
+                trTypes.push(data);
+            }).catch(err => {
+                trTypes.push(err);
+            }));
+        });
+        Promise.all(promises).then(() => {                
+            resolve(trTypes);
+        });
+    });
+}
+
+export {defaultData,addMultipleTransactionTypes};

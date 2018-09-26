@@ -5,7 +5,7 @@ const tables = {
     "dashboard":"dashboard",
     "transactions" : "transactions",
     "persons":"persons",
-    "tranctionTypes":"tranctionTypes"
+    "transactionTypes":"transactionTypes"
 }
 const tableSchemas = 
     {
@@ -36,8 +36,8 @@ const tableSchemas =
         }
     },
     //master Tables
-    "tranctionTypes":{
-        TableName: tables["tranctionTypes"],
+    "transactionTypes":{
+        TableName: tables["transactionTypes"],
         KeySchema: [
             {AttributeName: "id", KeyType: "HASH"}  
         ],

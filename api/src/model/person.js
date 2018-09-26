@@ -1,7 +1,5 @@
-import { defaultData } from "../database/defaultData";
 import { dynamoClient } from "../config/awsResources";
 import { tables } from "../database/schema";
-import { parseToInt } from "../helpers/utility";
 import uuid from "uuid/v1";
 
 class personRepo {

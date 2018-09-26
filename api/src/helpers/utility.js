@@ -40,4 +40,4 @@ const utility = {
     }
 }
 
-export { utility };
+export default utility ;
