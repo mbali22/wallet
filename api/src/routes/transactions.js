@@ -1,18 +1,39 @@
 import express from 'express';
-import * as walletController from '../controller/transactions';
-
+import transaction from '../controller/transactions';
 
 const router = express();
-
-router.get('/transactions', function (req, res) {  
-  walletController.getwalletTrans().then((responseData) => {
-    res.json( { data:responseData } );
-  }).catch(err => {
-    res.status(500).json({ error: err });
-  });
+//routes for handling person related
+router.get('/:personId', function (req, res) {
+    transaction.getAllTransactions(req).then((responseData) => {
+        res.json({ data: responseData });
+    }).catch(err => {
+        res.status(500).json({ error: err });
+    });
 })
 
+router.post('/', function (req, res) {
+    transaction.addTransaction(req).then((responseData) => {
+        res.json({ data: responseData });
+    }).catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
 
+router.put('/', function (req, res) {    
+    transaction.updateTransaction(req).then((responseData) => {
+        res.json({ data: responseData });
+    }).catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
+
+router.delete('/', function (req, res) {
+    transaction.deleteTransaction(req).then((responseData) => {
+        res.json({ data: responseData });
+    }).catch(err => {
+        res.status(500).json({ error: err });
+    });
+});
 
 
 

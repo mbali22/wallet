@@ -13,27 +13,53 @@ class transactionsRepo {
 
   }
 
-  AddTransaction(transaction) {
-
+  getTransactionsByPersonId(personId) {
+    return new Promise((resolve, reject) => {
+      let getParams = this.getParamsForDb(personId);
+      dynamoClient.query(getParams, function (err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
   }
 
-  insertTransactionToDb(transaction){
+  AddTransaction(transaction) {
+    let addedTransaction = await this.insertTransactionToDb(transaction);
+    return addedTransaction;
+  }
+
+  insertTransactionToDb(transaction) {
     return new Promise((resolve, reject) => {
-      let newTransaction = this.putParamsForDb(transaction);            
+      let newTransaction = this.putParamsForDb(transaction);
       dynamoClient.put(newTransaction, function (err, data) {
-          if (err) {
-              err.status = "failed";
-              reject(err);
-          }
-          else {
-              resolve({ "status": "success", "response":data });
-          }
+        if (err) {
+          err.status = "failed";
+          reject(err);
+        }
+        else {
+          resolve({ "status": "success", "response": data });
+        }
       });
-  });      
-}
+    });
+  }
 
   AddMultipleTransaction(transactions) {
-
+    return new Promise((resolve, reject) => {
+      let addedTransactions = []; let promises = [];
+      transactions.forEach(transaction => {
+        promises.push(this.insertPersonToDB(transaction).then(data => {
+          addedTransactions.push(data);
+        }).catch(err => {
+          addedTransactions.push(err);
+        }));
+      });
+      Promise.all(promises).then(() => {
+        resolve(addedTransactions);
+      });
+    });
   }
 
   UpdateTransaction(transation) {
@@ -46,15 +72,18 @@ class transactionsRepo {
 
   //Util functions
   putParamsForDb(transaction) {
-     if(transaction){
-       transaction.date = FormatToISO8601(transaction.date);
-       transaction.modifiedDate = FormatToISO8601(new Date());       
-     }
+
+    if (transaction) {
+      transaction.id = uuid();
+      transaction.date = FormatToISO8601(transaction.date);
+      transaction.modifiedDate = FormatToISO8601(transaction.date);
+      transaction.amount = parseFloat(transaction.amount);
+    }
     var params = {
       TableName: tables["transactions"],
-      Item: person,
-      ConditionExpression: 'attribute_not_exists(personId) AND attribute_not_exists(date)',
-      ReturnValues: 'ALL_OLD', // optional (NONE | ALL_OLD)
+      Item: transaction,
+      ConditionExpression: 'attribute_not_exists(id)',
+      ReturnValues: 'ALL_OLD',
     };
     return params;
   }
@@ -66,7 +95,7 @@ class transactionsRepo {
       ExpressionAttributeNames: {
         '#whose': 'personId'
       },
-      ExpressionAttributeValues: { 
+      ExpressionAttributeValues: {
         ':value': transaction.personId
       }
     };

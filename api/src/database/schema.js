@@ -24,12 +24,12 @@ const tableSchemas =
     "transactions": {
         TableName: tables["transactions"],
         KeySchema: [
-            { AttributeName: "personId", KeyType: "HASH"}, //Partition key 
-            {AttributeName: "date",KeyType: "RANGE"}
+            { AttributeName: "id", KeyType: "HASH"}            
         ],
         AttributeDefinitions: [
+            {AttributeName: "id", AttributeType: "S"},
             {AttributeName: "personId", AttributeType: "S"},
-            {AttributeName: "date",AttributeType: "S"}
+            {AttributeName: "date", AttributeType: "S"}
         ],
         ProvisionedThroughput: {
             ReadCapacityUnits: 10,WriteCapacityUnits: 10
@@ -37,8 +37,8 @@ const tableSchemas =
         GlobalSecondaryIndexes: [{
             IndexName: "PersonTransactions",
             KeySchema: [
-                { AttributeName: "personId", KeyType: "HASH"}, //Partition key 
-                {AttributeName: "date",KeyType: "RANGE"}
+                { AttributeName: "personId", KeyType: "HASH"},
+                { AttributeName: "date",KeyType: "RANGE"}
             ],
             Projection: {
                 ProjectionType: "ALL"

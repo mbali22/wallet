@@ -1,7 +1,5 @@
 import express from 'express';
 import person from '../controller/person';
-import { resolve } from 'dns';
-
 
 const router = express();
 //routes for handling person related
