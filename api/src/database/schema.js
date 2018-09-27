@@ -33,7 +33,21 @@ const tableSchemas =
         ],
         ProvisionedThroughput: {
             ReadCapacityUnits: 10,WriteCapacityUnits: 10
-        }
+        },
+        GlobalSecondaryIndexes: [{
+            IndexName: "PersonTransactions",
+            KeySchema: [
+                { AttributeName: "personId", KeyType: "HASH"}, //Partition key 
+                {AttributeName: "date",KeyType: "RANGE"}
+            ],
+            Projection: {
+                ProjectionType: "ALL"
+            },
+            ProvisionedThroughput: {
+                ReadCapacityUnits: 10,
+                WriteCapacityUnits: 10
+            }
+        }]
     },
     //master Tables
     "transactionTypes":{
