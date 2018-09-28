@@ -1,15 +1,17 @@
 import transactionRepo from '../model/transactions';
+import { resolve } from 'url';
 
 
 class transactionController {
 
   async getAllTransactions(req) {        
           let transactionId = req.params.personId;
-          let result =  await transactionRepo.getTransactionsById(personId);
+          let result =  await transactionRepo.getTransactionsByPersonId(personId);
           return result;         
   }
 
-  async addTransaction(req) {      
+  async addTransaction(req) {   
+          resolve('workinggg');
           let transactions = this.getTransactionFromRequestBody(req);            
           if (Array.isArray(transactions)) {   
               let result = await transactionRepo.addMultipleTransactions(transactions);

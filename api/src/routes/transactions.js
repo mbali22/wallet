@@ -1,5 +1,6 @@
 import express from 'express';
 import transaction from '../controller/transactions';
+import { resolve } from 'path';
 
 const router = express();
 //routes for handling person related
@@ -12,6 +13,7 @@ router.get('/:personId', function (req, res) {
 })
 
 router.post('/', function (req, res) {
+    resolve('woooooo');
     transaction.addTransaction(req).then((responseData) => {
         res.json({ data: responseData });
     }).catch(err => {

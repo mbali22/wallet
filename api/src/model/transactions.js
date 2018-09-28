@@ -26,7 +26,7 @@ class transactionsRepo {
     });
   }
 
-  AddTransaction(transaction) {
+  async AddTransaction(transaction) {
     let addedTransaction = await this.insertTransactionToDb(transaction);
     return addedTransaction;
   }
@@ -34,6 +34,7 @@ class transactionsRepo {
   insertTransactionToDb(transaction) {
     return new Promise((resolve, reject) => {
       let newTransaction = this.putParamsForDb(transaction);
+      resolve(newTransaction);
       dynamoClient.put(newTransaction, function (err, data) {
         if (err) {
           err.status = "failed";
@@ -91,13 +92,15 @@ class transactionsRepo {
   getParamsForDb(transaction) {
     var params = {
       TableName: tables["transactions"],
+      IndexName: tables["IdxPersonTransactions"],
       KeyConditionExpression: '#whose = :value',
       ExpressionAttributeNames: {
         '#whose': 'personId'
       },
       ExpressionAttributeValues: {
         ':value': transaction.personId
-      }
+      },
+      ScanIndexForward:false
     };
     return params;
   }

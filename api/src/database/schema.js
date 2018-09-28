@@ -5,7 +5,8 @@ const tables = {
     "dashboard":"dashboard",
     "transactions" : "transactions",
     "persons":"persons",
-    "transactionTypes":"transactionTypes"
+    "transactionTypes":"transactionTypes",
+    "IdxPersonTransactions":"IdxPersonTransactions"
 }
 const tableSchemas = 
     {
@@ -35,7 +36,7 @@ const tableSchemas =
             ReadCapacityUnits: 10,WriteCapacityUnits: 10
         },
         GlobalSecondaryIndexes: [{
-            IndexName: "PersonTransactions",
+            IndexName: "IdxPersonTransactions",
             KeySchema: [
                 { AttributeName: "personId", KeyType: "HASH"},
                 { AttributeName: "date",KeyType: "RANGE"}
