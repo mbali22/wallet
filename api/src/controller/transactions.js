@@ -1,5 +1,4 @@
 import transactionRepo from '../model/transactions';
-import { resolve } from 'url';
 
 
 class transactionController {
@@ -11,13 +10,13 @@ class transactionController {
   }
 
   async addTransaction(req) {   
-          resolve('workinggg');
-          let transactions = this.getTransactionFromRequestBody(req);            
-          if (Array.isArray(transactions)) {   
+        
+          let transactions = this.getTransactionFromRequestBody(req);          
+          if (Array.isArray(transactions)) {                   
               let result = await transactionRepo.addMultipleTransactions(transactions);
               return result;               
           }
-          else if (typeof(transactions) === 'object') {  
+          else if (typeof(transactions) === 'object') {                      
               let result = await transactionRepo.addTransaction(transactions);
               return result;                
           }        

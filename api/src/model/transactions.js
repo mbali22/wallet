@@ -3,11 +3,10 @@ import { defaultData } from "../database/defaultData";
 import { dynamoClient } from "../config/awsResources";
 import { tables } from "../database/schema";
 import uuid from "uuid/v1";
-import { FormatToISO8601 } from "../helpers/utility";
+import util from "../helpers/utility";
 
 class transactionsRepo {
-  constructor() {
-  }
+  
 
   GetDashBoardInfo() {
 
@@ -26,24 +25,64 @@ class transactionsRepo {
     });
   }
 
-  async AddTransaction(transaction) {
-    let addedTransaction = await this.insertTransactionToDb(transaction);
+  async addTransaction(transaction) {    
+    let addedTransaction = await this.insertTransaction(transaction);
     return addedTransaction;
   }
-
+  
+  async insertTransaction(transaction){
+    let transactionStatus = await this.insertTransactionToDb(transaction);
+    let dashboardStatus;
+    if(transactionStatus.status === "success"){
+      dashboardStatus = await this.updatetDashBoardInfo(transactionStatus.newTransaction);      
+    }
+    return dashboardStatus;
+}
   insertTransactionToDb(transaction) {
-    return new Promise((resolve, reject) => {
-      let newTransaction = this.putParamsForDb(transaction);
-      resolve(newTransaction);
+    return new Promise((resolve, reject) => {      
+      let newTransaction = this.putParamsForDb(transaction);      
       dynamoClient.put(newTransaction, function (err, data) {
         if (err) {
           err.status = "failed";
           reject(err);
         }
-        else {
-          resolve({ "status": "success", "response": data });
+        else {           
+          resolve({"status":"success","newTransaction": newTransaction});
         }
       });
+    });
+  }
+
+  updatetDashBoardInfo(transaction) {
+    return new Promise((resolve, reject) => {
+      let dashboard = {
+        personId: transaction.personId,
+        transactionType: util.getDashboardType(transaction.type),
+        amount: transaction.amount
+      };
+      let dashParams = {
+        TableName: tables["dashboard"],
+        Key: {
+          "personId": dashboard.personId,
+        },
+        UpdateExpression: 'SET amount = amount + :amount, transactionType = :type',
+        ExpressionAttributeValues: {
+          ":amount": dashboard.amount,
+          ":type": dashboard.transactionType
+        },
+        ReturnValues: 'UPDATED_NEW',
+      };
+
+      resolve(dashParams);
+
+      // dynamoClient.update(dashParams, function (err, data) {
+      //   if (err) {
+      //     reject({ "status": "fail", "reason": err })
+      //   }
+      //   else if (data) {
+      //     resolve({ "status": "success", "message": "transaction added successfully", "data": data });
+      //   }
+      // });
     });
   }
 
@@ -76,8 +115,8 @@ class transactionsRepo {
 
     if (transaction) {
       transaction.id = uuid();
-      transaction.date = FormatToISO8601(transaction.date);
-      transaction.modifiedDate = FormatToISO8601(transaction.date);
+      transaction.date = util.FormatToISO8601(new Date(transaction.date));
+      transaction.modifiedDate = util.FormatToISO8601(new Date(transaction.date));
       transaction.amount = parseFloat(transaction.amount);
     }
     var params = {

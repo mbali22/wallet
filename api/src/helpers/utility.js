@@ -1,3 +1,4 @@
+import config from '../config';
 //Common Functions
 function pad(number) {
     if (number < 10) {
@@ -6,18 +7,19 @@ function pad(number) {
     return number;
 }
 
-const utility = {
+let utility = {
     parseToInt: (number) => {
         return parseInt(number);
     },
-    FormatToISO8601: (date) => {
+    FormatToISO8601: (date) => {    
+        let currDate = new Date();    
         return date.getFullYear() +
             '-' + pad(date.getMonth() + 1) +
             '-' + pad(date.getDate()) +
-            'T' + pad(date.getHours()) +
-            ':' + pad(date.getMinutes()) +
-            ':' + pad(date.getSeconds()) +
-            '.' + (date.getMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+            'T' + pad(currDate.getHours()) +
+            ':' + pad(currDate.getMinutes()) +
+            ':' + pad(currDate.getSeconds()) +
+            '.' + (currDate.getMilliseconds() / 1000).toFixed(3).slice(2, 5) +
             'Z';
     },
     getuniqueId : function(){
@@ -37,7 +39,23 @@ const utility = {
             default:
                 break;
         }
+    },
+    getDashboardType : (typeTransaction) => {
+        let type;
+        switch (typeTransaction) {
+            case (1 || 2):
+            type =  config.dashBoard.credit
+                break;          
+            case (3 || 4):
+            type =  config.dashBoard.debit
+                break;
+            case 5:
+            type = config.dashBoard.transactions
+            default:
+                break;
+        }
+        return type;
     }
 }
 
-export default utility ;
+export default utility;

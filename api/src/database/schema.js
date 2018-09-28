@@ -16,7 +16,7 @@ const tableSchemas =
                 {AttributeName: "personId", KeyType: "HASH"}            
             ],
             AttributeDefinitions: [
-                { AttributeName: "personId",AttributeType: "N"}            
+                { AttributeName: "personId",AttributeType: "S"}            
             ],
             ProvisionedThroughput: {
                 ReadCapacityUnits: 10,WriteCapacityUnits: 10
