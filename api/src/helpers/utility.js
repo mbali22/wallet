@@ -43,10 +43,16 @@ let utility = {
     getDashboardType : (typeTransaction) => {
         let type;
         switch (typeTransaction) {
-            case (1 || 2):
+            case 1:
             type =  config.dashBoard.credit
                 break;          
-            case (3 || 4):
+            case 2:
+            type =  config.dashBoard.credit
+                break;
+            case 3:
+            type =  config.dashBoard.debit
+                break;
+            case 4:
             type =  config.dashBoard.debit
                 break;
             case 5:

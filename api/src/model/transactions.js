@@ -34,10 +34,11 @@ class transactionsRepo {
     let transactionStatus = await this.insertTransactionToDb(transaction);
     let dashboardStatus;
     if(transactionStatus.status === "success"){
-      dashboardStatus = await this.updatetDashBoardInfo(transactionStatus.newTransaction);      
+      dashboardStatus = await this.addDashboardInfo(transaction);      
     }
     return dashboardStatus;
-}
+  }
+
   insertTransactionToDb(transaction) {
     return new Promise((resolve, reject) => {      
       let newTransaction = this.putParamsForDb(transaction);      
@@ -53,8 +54,73 @@ class transactionsRepo {
     });
   }
 
-  updatetDashBoardInfo(transaction) {
+  async addDashboardInfo(transaction) {   
+      let infoExist = await dashboardInfoExist(transaction);
+      if(infoExist.Item.Count == 0){
+        let addedInfo = await this.insertDashboard(transaction);
+        return addedInfo;
+      }else{
+       let updatedInfo = await this.updateDashBoardInfo(transaction);
+       return updatedInfo;
+      }   
+  }
+  
+  updateDashBoardInfo(){
+    return new Promise((resolve,reject) => {
+        let dashboard = {
+          personId: transaction.personId,
+          transactionType: util.getDashboardType(transaction.type),
+          amount: transaction.amount
+        };
+        let dashParams = {
+          TableName: tables["dashboard"],
+          Key: {
+            "personId": dashboard.personId,
+          },
+          UpdateExpression: 'SET amount = amount + :amount, transactionType = :type',
+          ExpressionAttributeValues: {
+            ":amount": dashboard.amount,
+            ":type": dashboard.transactionType
+          },
+          ReturnValues: 'UPDATED_NEW',
+        };
+        
+        dynamoClient.update(dashParams, function (err, data) {
+          if (err) {
+            reject({ "status": "fail", "reason": err })
+          }
+          else if (data) {
+            resolve({ "status": "success", "message": "transaction added successfully", "data": data });
+          }
+        });
+    });
+  }
+
+  dashboardInfoExist(transaction) {
     return new Promise((resolve, reject) => {
+      var dashboardInfoExist = {
+        TableName: tables["dashboard"],
+        KeyConditionExpression: '#whose = :value',
+        ExpressionAttributeNames: {
+          '#whose': 'personId'
+        },
+        ExpressionAttributeValues: {
+          ':value': transaction.personId
+        }
+      };
+
+      dynamoClient.query(dashboardInfoExist, function (err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
+   
+  insertDashboard(transaction){
+    return new Promise((resolve, reject) => {      
       let dashboard = {
         personId: transaction.personId,
         transactionType: util.getDashboardType(transaction.type),
@@ -62,27 +128,18 @@ class transactionsRepo {
       };
       let dashParams = {
         TableName: tables["dashboard"],
-        Key: {
-          "personId": dashboard.personId,
-        },
-        UpdateExpression: 'SET amount = amount + :amount, transactionType = :type',
-        ExpressionAttributeValues: {
-          ":amount": dashboard.amount,
-          ":type": dashboard.transactionType
-        },
-        ReturnValues: 'UPDATED_NEW',
+        Item: dashboard,        
+        ReturnValues: 'ALL_OLD',
       };
-
-      resolve(dashParams);
-
-      // dynamoClient.update(dashParams, function (err, data) {
-      //   if (err) {
-      //     reject({ "status": "fail", "reason": err })
-      //   }
-      //   else if (data) {
-      //     resolve({ "status": "success", "message": "transaction added successfully", "data": data });
-      //   }
-      // });
+      
+      dynamoClient.put(dashParams, function (err, data) {
+        if (err) {
+          reject({ "status": "fail", "reason": err })
+        }
+        else if (data) {
+          resolve({ "status": "success", "message": "transaction added successfully", "data": data });
+        }
+      });
     });
   }
 
