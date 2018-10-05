@@ -25,47 +25,43 @@ class transactionsRepo {
     });
   }
 
-  async addTransaction(transaction) {    
-    let addedTransaction = await this.insertTransaction(transaction);
+  async addTransaction(transaction) {     
+    let addedTransaction = await this.addNewTransaction(transaction);
     return addedTransaction;
-  }
+  } 
+
   
-  async insertTransaction(transaction){
-    let transactionStatus = await this.insertTransactionToDb(transaction);
-    let dashboardStatus;
-    if(transactionStatus.status === "success"){
-      dashboardStatus = await this.addDashboardInfo(transaction);      
-    }
-    return dashboardStatus;
+  async addNewTransaction(transaction) {       
+    let trResponse = await this.insertTransaction(transaction);    
+    if(trResponse && trResponse.status === "success"){      
+      let infoExist = await this.dashboardInfoExist(trResponse.newTransaction);       
+      if(infoExist && infoExist.Count == 0){
+          let newDashBoardInfo = this.addDashboardInfo(trResponse.newTransaction);                 
+          return newDashBoardInfo;
+      }else{          
+          let updatedInfo = await this.updateDashBoardInfo(trResponse.newTransaction);
+          console.log(updatedInfo);
+          return updatedInfo;      
+      }
+    }  
   }
 
-  insertTransactionToDb(transaction) {
-    return new Promise((resolve, reject) => {      
-      let newTransaction = this.putParamsForDb(transaction);      
+  insertTransaction(transaction) {
+    return new Promise((resolve, reject) => {            
+      let newTransaction = this.putParamsForDb(transaction);        
       dynamoClient.put(newTransaction, function (err, data) {
-        if (err) {
+        if (err) {          
           err.status = "failed";
           reject(err);
         }
-        else {           
-          resolve({"status":"success","newTransaction": newTransaction});
+        else {             
+          resolve({"status":"success","newTransaction": newTransaction.Item});
         }
       });
     });
   }
 
-  async addDashboardInfo(transaction) {   
-      let infoExist = await dashboardInfoExist(transaction);
-      if(infoExist.Item.Count == 0){
-        let addedInfo = await this.insertDashboard(transaction);
-        return addedInfo;
-      }else{
-       let updatedInfo = await this.updateDashBoardInfo(transaction);
-       return updatedInfo;
-      }   
-  }
-  
-  updateDashBoardInfo(){
+  updateDashBoardInfo(transaction){
     return new Promise((resolve,reject) => {
         let dashboard = {
           personId: transaction.personId,
@@ -84,7 +80,7 @@ class transactionsRepo {
           },
           ReturnValues: 'UPDATED_NEW',
         };
-        
+        console.log(dashParams);
         dynamoClient.update(dashParams, function (err, data) {
           if (err) {
             reject({ "status": "fail", "reason": err })
@@ -96,31 +92,8 @@ class transactionsRepo {
     });
   }
 
-  dashboardInfoExist(transaction) {
+  addDashboardInfo(transaction) {
     return new Promise((resolve, reject) => {
-      var dashboardInfoExist = {
-        TableName: tables["dashboard"],
-        KeyConditionExpression: '#whose = :value',
-        ExpressionAttributeNames: {
-          '#whose': 'personId'
-        },
-        ExpressionAttributeValues: {
-          ':value': transaction.personId
-        }
-      };
-
-      dynamoClient.query(dashboardInfoExist, function (err, data) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      });
-    });
-  }
-   
-  insertDashboard(transaction){
-    return new Promise((resolve, reject) => {      
       let dashboard = {
         personId: transaction.personId,
         transactionType: util.getDashboardType(transaction.type),
@@ -128,10 +101,11 @@ class transactionsRepo {
       };
       let dashParams = {
         TableName: tables["dashboard"],
-        Item: dashboard,        
+        Item:dashboard,
+        ConditionExpression: 'attribute_not_exists(personId)',
         ReturnValues: 'ALL_OLD',
       };
-      
+      console.log(dashParams);
       dynamoClient.put(dashParams, function (err, data) {
         if (err) {
           reject({ "status": "fail", "reason": err })
@@ -143,11 +117,35 @@ class transactionsRepo {
     });
   }
 
+  dashboardInfoExist(transaction) {
+    return new Promise((resolve, reject) => {
+      
+      let dashboardInfoExist = {
+        TableName: tables["dashboard"],
+        KeyConditionExpression: '#whose = :value',
+        ExpressionAttributeNames: {
+          '#whose': 'personId'
+        },
+        ExpressionAttributeValues: {
+          ':value': transaction.personId
+        }
+      };
+      
+      dynamoClient.query(dashboardInfoExist, function (err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
+     
   AddMultipleTransaction(transactions) {
     return new Promise((resolve, reject) => {
       let addedTransactions = []; let promises = [];
       transactions.forEach(transaction => {
-        promises.push(this.insertPersonToDB(transaction).then(data => {
+        promises.push(this.addNewTransaction(transaction).then(data => {
           addedTransactions.push(data);
         }).catch(err => {
           addedTransactions.push(err);
