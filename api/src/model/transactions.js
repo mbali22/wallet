@@ -39,11 +39,10 @@ class transactionsRepo {
           let newDashBoardInfo = this.addDashboardInfo(trResponse.newTransaction);                 
           return newDashBoardInfo;
       }else{          
-          let updatedInfo = await this.updateDashBoardInfo(trResponse.newTransaction);
-          console.log(updatedInfo);
+          let updatedInfo = await this.updateDashBoardInfo(trResponse.newTransaction);          
           return updatedInfo;      
       }
-    }  
+    } 
   }
 
   insertTransaction(transaction) {
@@ -80,7 +79,7 @@ class transactionsRepo {
           },
           ReturnValues: 'UPDATED_NEW',
         };
-        console.log(dashParams);
+        
         dynamoClient.update(dashParams, function (err, data) {
           if (err) {
             reject({ "status": "fail", "reason": err })
@@ -104,8 +103,7 @@ class transactionsRepo {
         Item:dashboard,
         ConditionExpression: 'attribute_not_exists(personId)',
         ReturnValues: 'ALL_OLD',
-      };
-      console.log(dashParams);
+      };      
       dynamoClient.put(dashParams, function (err, data) {
         if (err) {
           reject({ "status": "fail", "reason": err })
@@ -157,9 +155,29 @@ class transactionsRepo {
     });
   }
 
-  UpdateTransaction(transation) {
-
+  async updateTransactonDetails(transaction){
+    let uTrDetails = await UpdateTransaction(transaction);
+    if(uTrDetails && uTrDetails.status === "success"){
+      let uDashInfo = this.updateDashBoardInfo(uTrDetails.updatedTransaction)
+    }
+    return uDashInfo;
   }
+  UpdateTransaction(transaction) {
+    return new Promise((resolve, reject) => {
+      let uTr = this.updateParamsForDb(transaction);
+      dynamoClient.update(uTr, function (err, data) {
+        if (err) {
+          err.status = "failed";
+          reject(err);
+        }
+        else {    
+          data.Attributes.personId = transaction.personId;      
+          resolve({"status": "success","updatedTransaction": data.Attributes});        
+        }
+      });
+    });
+}
+
 
   DeleteTransaction(transation) {
 
@@ -199,19 +217,29 @@ class transactionsRepo {
     return params;
   }
 
-  updateParamsForDb(person) {
+  updateParamsForDb(transaction) {
+    
+    if(transaction){      
+      transaction.modifiedDate = util.FormatToISO8601(new Date(transaction.date));
+      transaction.amount = parseFloat(transaction.amount);
+      transaction.type = parseInt(transaction.type);
+    }
+    
     var params = {
       TableName: tables["transactions"],
       Key: {
-        "personId": person.personId,
-        "date": person.date
+        "id": transaction.id
       },
-      UpdateExpression: 'SET fname = :fname, lname = :lname, Mobile = :Mobile',
-      ConditionExpression: 'attribute_exists(belongsTo) AND attribute_exists(id)',
+      UpdateExpression: 'SET amount = :amount, #type = :type, reason = :reason, modifiedDate = :modifiedDate',
+      ConditionExpression: 'attribute_exists(id)',
+      ExpressionAttributeNames:{
+        "#type":"type"
+      },
       ExpressionAttributeValues: {
-        ":lname": person.lname,
-        ":fname": person.fname,
-        ":Mobile": person.Mobile
+        ":amount": transaction.amount,
+        ":type": transaction.type,
+        ":reason": transaction.reason,
+        ":modifiedDate":transaction.modifiedDate
       },
       ReturnValues: 'UPDATED_NEW',
     };

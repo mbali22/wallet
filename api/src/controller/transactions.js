@@ -19,12 +19,12 @@ class transactionController {
           else if (typeof(transactions) === 'object') {                      
               let result = await transactionRepo.addTransaction(transactions);
               return result;                
-          }        
+          }
   }
 
   async updateTransaction(req) {       
           let transaction  = this.getTransactionFromRequestBody(req);            
-          let result = await transactionRepo.updateTransaction(transaction);
+          let result = await transactionRepo.UpdateTransaction(transaction);
           return result;        
   }
 
