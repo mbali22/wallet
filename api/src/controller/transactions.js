@@ -5,7 +5,7 @@ class transactionController {
 
   async getAllTransactions(req) {        
           let transactionId = req.params.personId;
-          let result =  await transactionRepo.getTransactionsByPersonId(personId);
+          let result =  await transactionRepo.getTransactionsByPersonId(transactionId);
           return result;         
   }
 

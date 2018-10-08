@@ -12,14 +12,20 @@ class transactionsRepo {
 
   }
 
-  getTransactionsByPersonId(personId) {
+  getTransactionsByPersonId(transactionId,LastEvaluatedKey = null) {
     return new Promise((resolve, reject) => {
-      let getParams = this.getParamsForDb(personId);
+      let getParams = this.getParamsForDb(transactionId,LastEvaluatedKey);
+      //resolve(getParams);
       dynamoClient.query(getParams, function (err, data) {
         if (err) {
           reject(err);
         } else {
-          resolve(data);
+          if(data.LastEvaluatedKey){
+            getTransactionsByPersonId(transactionId,LastEvaluatedKey)
+          }
+          else{
+            resolve(data);
+          }
         }
       });
     });
@@ -139,9 +145,10 @@ class transactionsRepo {
     });
   }
      
-  AddMultipleTransaction(transactions) {
+  addMultipleTransactions(transactions) {
     return new Promise((resolve, reject) => {
       let addedTransactions = []; let promises = [];
+      //resolve("added multiple");
       transactions.forEach(transaction => {
         promises.push(this.addNewTransaction(transaction).then(data => {
           addedTransactions.push(data);
@@ -157,11 +164,13 @@ class transactionsRepo {
 
   async updateTransactonDetails(transaction){
     let uTrDetails = await UpdateTransaction(transaction);
+    let uDashInfo;
     if(uTrDetails && uTrDetails.status === "success"){
-      let uDashInfo = this.updateDashBoardInfo(uTrDetails.updatedTransaction)
+      uDashInfo = this.updateDashBoardInfo(uTrDetails.updatedTransaction)
     }
     return uDashInfo;
   }
+  
   UpdateTransaction(transaction) {
     return new Promise((resolve, reject) => {
       let uTr = this.updateParamsForDb(transaction);
@@ -201,7 +210,7 @@ class transactionsRepo {
     return params;
   }
 
-  getParamsForDb(transaction) {
+  getParamsForDb(transactionId,LastEvaluatedKey) {
     var params = {
       TableName: tables["transactions"],
       IndexName: tables["IdxPersonTransactions"],
@@ -210,10 +219,13 @@ class transactionsRepo {
         '#whose': 'personId'
       },
       ExpressionAttributeValues: {
-        ':value': transaction.personId
+        ':value': transactionId
       },
       ScanIndexForward:false
     };
+    if(LastEvaluatedKey){
+      params.ExclusiveStartKey = LastEvaluatedKey;
+    }
     return params;
   }
 
