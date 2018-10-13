@@ -101,6 +101,10 @@ class transactionsRepo {
     return new Promise((resolve, reject) => {
       let dashboard = {
         personId: transaction.personId,
+        history: {
+          "credits": util.getDashboardType(transaction.type,transaction.amount),
+          "debits":5000
+        },
         transactionType: util.getDashboardType(transaction.type),
         amount: transaction.amount
       };

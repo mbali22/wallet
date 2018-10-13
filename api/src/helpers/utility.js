@@ -40,7 +40,7 @@ let utility = {
                 break;
         }
     },
-    getDashboardType : (typeTransaction) => {
+    getDashboardType : (typeTransaction,amount) => {
         let type;
         switch (typeTransaction) {
             case 1:
