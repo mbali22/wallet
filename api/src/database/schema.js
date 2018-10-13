@@ -5,8 +5,7 @@ const tables = {
     "dashboard":"dashboard",
     "transactions" : "transactions",
     "persons":"persons",
-    "transactionTypes":"transactionTypes",
-    "IdxPersonTransactions":"IdxPersonTransactions"
+    "transactionTypes":"transactionTypes",    
 }
 const tableSchemas = 
     {
@@ -68,11 +67,10 @@ const tableSchemas =
         KeySchema: [
             {AttributeName: "belongsTo", KeyType: "HASH"},
             {AttributeName: "id",KeyType: "RANGE"}
-
         ],
         AttributeDefinitions: [
-            { AttributeName: "belongsTo",AttributeType: "N"},
-            { AttributeName: "id",AttributeType: "N"}            
+            { AttributeName: "belongsTo",AttributeType: "S"},
+            { AttributeName: "id",AttributeType: "S"}            
         ],
         ProvisionedThroughput: {
             ReadCapacityUnits: 10,WriteCapacityUnits: 10
@@ -85,8 +83,7 @@ function createDBScehma() {
     return new Promise((resolve, reject) => {
         let promises= []; let tableResults = [];
         //resolve(Object.keys(tables));                    
-        Object.keys(tables).forEach((table) => {
-            console.log(table);
+        Object.keys(tables).forEach((table) => {            
             promises.push(
                 createDynamoDBTable(table).then(data => {
                     tableResults.push(data);
@@ -103,6 +100,42 @@ function createDBScehma() {
     });
 }
 
+function deleteDBSchema(){
+    return new Promise((resolve,reject) => {
+        let promises= []; let tableResults = [];
+        //resolve(Object.keys(tables));                    
+        Object.keys(tables).forEach((table) => {            
+            promises.push(
+                deletSchema(table).then(data => {
+                    tableResults.push(data);
+                }).catch(err => {
+                    tableResults.push(err);
+                })
+            );
+        });
+        Promise.all(promises).then(() => {
+            resolve(tableResults);
+        }).catch(error => {
+            reject(tableResults);
+        });
+    });
+}
+
+function deletSchema(table){
+    return new Promise((resolve,reject) => {
+        var params = {
+            TableName: table,
+        };
+        dynamo.deleteTable(params, function(err, data) {
+            if (err) {                
+                reject({[table] :err});
+            }
+            else {                
+                resolve({[table] :data});
+            }
+        });
+    });
+}
 
 function createDynamoDBTable(table) {
     return new Promise((resolve, reject) => {
@@ -121,7 +154,7 @@ function createDynamoDBTable(table) {
         }
     });
 }
-export {createDBScehma,tables};
+export {createDBScehma,tables,deleteDBSchema};
 
 
 

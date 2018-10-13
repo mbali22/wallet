@@ -40,26 +40,27 @@ let utility = {
                 break;
         }
     },
-    getDashboardType : (typeTransaction,amount) => {
+    getDashboardTypeAmount : (typeTransaction,amount) => {        
         let type;
         switch (typeTransaction) {
             case 1:
-            type =  config.dashBoard.credit
+            type =  amount;
                 break;          
             case 2:
-            type =  config.dashBoard.credit
+            type =  -amount;
                 break;
             case 3:
-            type =  config.dashBoard.debit
+            type =  amount;
                 break;
             case 4:
-            type =  config.dashBoard.debit
+            type =  -amount;
                 break;
             case 5:
-            type = config.dashBoard.transactions
+            type = amount;
             default:
+            type = 0;
                 break;
-        }
+        }        
         return type;
     }
 }
