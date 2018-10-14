@@ -12,7 +12,7 @@ class personRepo {
                     reject(err);
                }else{
                     resolve(data);
-               }            
+               }           
             });
        }); 
     }
@@ -29,7 +29,9 @@ class personRepo {
             
             if(person.type && person.type === "admin"){
                 person.belongsTo = person.id;
-            }            
+            }else{
+                person.belongsTo = "aa9aa1d0-cf89-11e8-9fa8-59ddb6b06ef5";
+            }         
             let newPerson = this.putParamsForDb(person);            
             dynamoClient.put(newPerson, function (err, data) {
                 if (err) {
@@ -63,19 +65,19 @@ class personRepo {
         return new Promise((resolve, reject) => {
             //resolve(person);                           
             let updatePerson = this.updateParamsForDb(person);            
-            dynamoClient.update(updatePerson, function(err, data) {
-                if (err){
-                    err.status = "failed";
-                    reject(err);
-                }
-                else{
-                    resolve({
-                        "status":"success",
-                        "updatedPeson":data
-                      }
-                    );
-                }
-            });
+                dynamoClient.update(updatePerson, function(err, data) {
+                    if (err){
+                        err.status = "failed";
+                        reject(err);
+                    }
+                    else{
+                        resolve({
+                            "status":"success",
+                            "updatedPeson":data
+                        }
+                        );
+                    }
+                });
         });
     }
 

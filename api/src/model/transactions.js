@@ -4,14 +4,14 @@ import { dynamoClient } from "../config/awsResources";
 import { tables } from "../database/schema";
 import uuid from "uuid/v1";
 import util from "../helpers/utility";
+import config from "../config";
+
+const {dashBoard} = config;
 
 class transactionsRepo {
-  
-
   GetDashBoardInfo() {
 
   }
-
   getTransactionsByPersonId(transactionId,LastEvaluatedKey = null) {
     return new Promise((resolve, reject) => {
       let getParams = this.getParamsForDb(transactionId,LastEvaluatedKey);
@@ -38,17 +38,23 @@ class transactionsRepo {
 
   
   async addNewTransaction(transaction) {       
-    let trResponse = await this.insertTransaction(transaction);    
-    if(trResponse && trResponse.status === "success"){      
-      let infoExist = await this.dashboardInfoExist(trResponse.newTransaction);           
-      if(infoExist && infoExist.Count == 0){         
-          let newDashBoardInfo = this.addDashboardInfo(trResponse.newTransaction);
+    //let trResponse = await this.insertTransaction(transaction);    
+    if(true){      
+    //if(trResponse && trResponse.status === "success"){      
+      //let infoExist = await this.dashboardInfoExist(trResponse.newTransaction);
+      //console.log(infoExist);
+      if(false){ 
+      //if(infoExist && infoExist.Count == 0){  
+          console.log("workingggg");       
+          let newDashBoardInfo = await this.addDashboardInfo(transaction);
           return newDashBoardInfo;
-      }else{          
-          let updatedInfo = await this.updateDashBoardInfo(trResponse.newTransaction);          
+      }else{      
+          console.log("not workinggg");
+          //let updatedInfo = await this.updateDashBoardInfo(trResponse.newTransaction);          
+          let updatedInfo = await this.updateDashBoardInfo(transaction);          
           return updatedInfo;      
-      }
-    } 
+       }
+    }
   }
 
   insertTransaction(transaction) {
@@ -68,31 +74,83 @@ class transactionsRepo {
 
   updateDashBoardInfo(transaction){
     return new Promise((resolve,reject) => {
+        let attriButesValues = {}; let setExpression = 'SET';
         let dashboard = {
-          personId: transaction.personId,
-          // transactionType: util.getDashboardType(transaction.type),
-          //amount: transaction.amount
-          history: {
-            "credits": util.getDashboardTypeAmount(transaction.type,transaction.amount),
-            "debits":util.getDashboardTypeAmount(transaction.type,transaction.amount),
-            "expense":util.getDashboardTypeAmount(transaction.type,transaction.amount)
-          }          
+          personId: transaction.personId                 
         };
+        let trType = util.getDashboardType(transaction.type);     
+        if(trType === dashBoard.credit){
+          dashboard.history = {
+            credits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
+          }
+          attriButesValues[":credit"] = dashboard.history.credits;
+          setExpression = setExpression + " history.credits = history.credits + :credit";
+        }else if(trType === dashBoard.debit){
+          dashboard.history = {
+            debits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
+          }
+          attriButesValues[":debit"] = dashboard.history.debits;
+          setExpression = setExpression + " history.debits = history.debits + :debit";
+        }else if(trType === dashBoard.expense){
+          dashboard.history = {
+            expense : util.getDashboardTypeAmount(transaction.type,transaction.amount)
+          }
+          attriButesValues[":expense"] = dashboard.history.expense;
+          setExpression = setExpression + " history.expense = history.expense + :expense";
+        }
+        
         let dashParams = {
           TableName: tables["dashboard"],
           Key: {
             "personId": dashboard.personId,
           },
-          UpdateExpression: 'SET history.credits = history.credits + :credit, history.debits = history.debits + :debit, history.expense = history.expense + :expense',
-          ExpressionAttributeValues: {
-            ":credit": history.credits,
-            ":debit": history.debits,
-            ":expense":history.expense
-          },
+          UpdateExpression: setExpression,
+          ExpressionAttributeValues: attriButesValues,
           ReturnValues: 'UPDATED_NEW',
         };
+        resolve(dashParams);
+        // dynamoClient.update(dashParams, function (err, data) {
+        //   if (err) {
+        //     reject({ "status": "fail", "reason": err })
+        //   }
+        //   else if (data) {
+        //     resolve({ "status": "success", "message": "transaction added successfully", "data": data });
+        //   }
+        // });
+    });
+  }
+
+  addDashboardInfo(transaction) {
+    return new Promise((resolve, reject) => {             
         
-        dynamoClient.update(dashParams, function (err, data) {
+        let dashboard = {
+          personId: transaction.personId               
+        };
+
+        let trType = util.getDashboardType(transaction.type);     
+                
+        if(trType === dashBoard.credit){          
+          dashboard.history = {
+            credits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
+          }          
+        }else if(trType === dashBoard.debit){
+          dashboard.history = {
+            debits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
+          };
+        }else if(trType === dashBoard.expense){
+          dashboard.history = {
+            expense : util.getDashboardTypeAmount(transaction.type,transaction.amount)
+          }
+        }
+        
+        let dashParams = {
+          TableName: tables["dashboard"],
+          Item:dashboard,
+          ConditionExpression: 'attribute_not_exists(personId)',
+          ReturnValues: 'ALL_OLD',
+        };    
+        
+        dynamoClient.put(dashParams, function (err, data) {
           if (err) {
             reject({ "status": "fail", "reason": err })
           }
@@ -100,37 +158,6 @@ class transactionsRepo {
             resolve({ "status": "success", "message": "transaction added successfully", "data": data });
           }
         });
-    });
-  }
-
-  addDashboardInfo(transaction) {
-    return new Promise((resolve, reject) => {  
-      console.log("workinggg");
-      resolve("workinggggggggggggggg");
-      //resolve(util.getDashboardTypeAmount(transaction.type,transaction.amount));
-      // let dashboard = {
-      //   personId: transaction.personId
-      //   // history: {
-      //   //   "credits":util.getDashboardTypeAmount(transaction.type,transaction.amount),
-      //   //   "debits":util.getDashboardTypeAmount(transaction.type,transaction.amount),
-      //   //   "expense":util.getDashboardTypeAmount(transaction.type,transaction.amount)
-      //   // }      
-      // };
-      // let dashParams = {
-      //   TableName: tables["dashboard"],
-      //   Item:dashboard,
-      //   ConditionExpression: 'attribute_not_exists(personId)',
-      //   ReturnValues: 'ALL_OLD',
-      // };    
-      // resolve(dashParams);
-      // dynamoClient.put(dashParams, function (err, data) {
-      //   if (err) {
-      //     reject({ "status": "fail", "reason": err })
-      //   }
-      //   else if (data) {
-      //     resolve({ "status": "success", "message": "transaction added successfully", "data": data });
-      //   }
-      // });
     });
   }
 

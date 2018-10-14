@@ -62,6 +62,29 @@ let utility = {
                 break;
         }        
         return type;
+    },
+    getDashboardType : (typeTransaction) => {        
+        let type;
+        switch (typeTransaction) {
+            case 1:
+            type =  1;
+                break;          
+            case 2:
+            type =  1;
+                break;
+            case 3:
+            type =  2;
+                break;
+            case 4:
+            type =  2;
+                break;
+            case 5:
+            type = 3;
+            default:
+            type = 0;
+                break;
+        }        
+        return type;
     }
 }
 

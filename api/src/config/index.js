@@ -9,6 +9,6 @@ export default {
   "dashBoard":{
     "credit":1,
     "debit":2,
-    "transactions":3
+    "expense":3
   }  
 }
