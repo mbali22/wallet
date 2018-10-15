@@ -57,6 +57,7 @@ let utility = {
                 break;
             case 5:
             type = amount;
+                break;
             default:
             type = 0;
                 break;
@@ -80,6 +81,7 @@ let utility = {
                 break;
             case 5:
             type = 3;
+                break;
             default:
             type = 0;
                 break;

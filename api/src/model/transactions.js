@@ -78,7 +78,8 @@ class transactionsRepo {
         let dashboard = {
           personId: transaction.personId                 
         };
-        let trType = util.getDashboardType(transaction.type);     
+
+        let trType = util.getDashboardType(transaction.type);             
         if(trType === dashBoard.credit){
           dashboard.history = {
             credits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
@@ -108,15 +109,15 @@ class transactionsRepo {
           ExpressionAttributeValues: attriButesValues,
           ReturnValues: 'UPDATED_NEW',
         };
-        resolve(dashParams);
-        // dynamoClient.update(dashParams, function (err, data) {
-        //   if (err) {
-        //     reject({ "status": "fail", "reason": err })
-        //   }
-        //   else if (data) {
-        //     resolve({ "status": "success", "message": "transaction added successfully", "data": data });
-        //   }
-        // });
+        //resolve(dashParams);
+        dynamoClient.update(dashParams, function (err, data) {
+          if (err) {
+            reject({ "status": "fail", "reason": err })
+          }
+          else if (data) {
+            resolve({ "status": "success", "message": "transaction added successfully", "data": data });
+          }
+        });
     });
   }
 
