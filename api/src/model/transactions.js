@@ -173,7 +173,7 @@ class transactionsRepo {
         } else {
           resolve(data);
         }
-      });
+      });22
     });
   }
      
@@ -204,15 +204,15 @@ class transactionsRepo {
   
   UpdateTransaction(transaction) {
     return new Promise((resolve, reject) => {
-      let uTr = this.updateParamsForDb(transaction);
+      let uTr = this.updateParamsForDb(transaction);      
       dynamoClient.update(uTr, function (err, data) {
         if (err) {
           err.status = "failed";
           reject(err);
         }
         else {    
-          data.Attributes.personId = transaction.personId;      
-          resolve({"status": "success","updatedTransaction": data.Attributes});        
+          let upTransaction = this.updateDashBoardInfo(data.Attributes)
+          resolve(upTransaction);        
         }
       });
     });
@@ -263,7 +263,7 @@ class transactionsRepo {
   updateParamsForDb(transaction) {
     
     if(transaction){      
-      transaction.modifiedDate = util.FormatToISO8601(new Date(transaction.date));
+      transaction.modifiedDate = util.FormatToISO8601(new Date());
       transaction.amount = parseFloat(transaction.amount);
       transaction.type = parseInt(transaction.type);
     }
@@ -273,7 +273,7 @@ class transactionsRepo {
       Key: {
         "id": transaction.id
       },
-      UpdateExpression: 'SET amount = :amount, #type = :type, reason = :reason, modifiedDate = :modifiedDate',
+      UpdateExpression: 'SET amount = :amount, #type = :type, reason = :reason, modifiedDate = :modifiedDate, personId = :personId',
       ConditionExpression: 'attribute_exists(id)',
       ExpressionAttributeNames:{
         "#type":"type"
@@ -282,7 +282,8 @@ class transactionsRepo {
         ":amount": transaction.amount,
         ":type": transaction.type,
         ":reason": transaction.reason,
-        ":modifiedDate":transaction.modifiedDate
+        ":modifiedDate":transaction.modifiedDate,
+        ":personId":transaction.personId
       },
       ReturnValues: 'UPDATED_NEW',
     };
