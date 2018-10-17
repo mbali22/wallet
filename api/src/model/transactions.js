@@ -38,20 +38,14 @@ class transactionsRepo {
 
   
   async addNewTransaction(transaction) {       
-    //let trResponse = await this.insertTransaction(transaction);    
-    if(true){      
-    //if(trResponse && trResponse.status === "success"){      
-      //let infoExist = await this.dashboardInfoExist(trResponse.newTransaction);
-      //console.log(infoExist);
-      if(false){ 
-      //if(infoExist && infoExist.Count == 0){  
-          console.log("workingggg");       
-          let newDashBoardInfo = await this.addDashboardInfo(transaction);
+    let trResponse = await this.insertTransaction(transaction);        
+    if(trResponse && trResponse.status === "success"){      
+      let infoExist = await this.dashboardInfoExist(trResponse.newTransaction);         
+      if(infoExist && infoExist.Count == 0){            
+          let newDashBoardInfo = await this.addDashboardInfo(trResponse.newTransaction);
           return newDashBoardInfo;
-      }else{      
-          console.log("not workinggg");
-          //let updatedInfo = await this.updateDashBoardInfo(trResponse.newTransaction);          
-          let updatedInfo = await this.updateDashBoardInfo(transaction);          
+      }else{                
+          let updatedInfo = await this.updateDashBoardInfo(trResponse.newTransaction);                    
           return updatedInfo;      
        }
     }
@@ -72,30 +66,29 @@ class transactionsRepo {
     });
   }
 
-  updateDashBoardInfo(transaction){
+  updateDashBoardInfo(transaction){    
     return new Promise((resolve,reject) => {
         let attriButesValues = {}; let setExpression = 'SET';
         let dashboard = {
-          personId: transaction.personId                 
+          personId: transaction.personId,
+          history:{
+            credits: 0,
+            debits : 0,
+            expense: 0
+          }         
         };
 
-        let trType = util.getDashboardType(transaction.type);             
+        let trType = util.getDashboardType(transaction.type);                     
         if(trType === dashBoard.credit){
-          dashboard.history = {
-            credits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
-          }
+          dashboard.history.credits = util.getDashboardTypeAmount(transaction.type,transaction.amount)          
           attriButesValues[":credit"] = dashboard.history.credits;
           setExpression = setExpression + " history.credits = history.credits + :credit";
         }else if(trType === dashBoard.debit){
-          dashboard.history = {
-            debits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
-          }
+          dashboard.history.debits = util.getDashboardTypeAmount(transaction.type,transaction.amount)          
           attriButesValues[":debit"] = dashboard.history.debits;
           setExpression = setExpression + " history.debits = history.debits + :debit";
         }else if(trType === dashBoard.expense){
-          dashboard.history = {
-            expense : util.getDashboardTypeAmount(transaction.type,transaction.amount)
-          }
+          dashboard.history.expense = util.getDashboardTypeAmount(transaction.type,transaction.amount)          
           attriButesValues[":expense"] = dashboard.history.expense;
           setExpression = setExpression + " history.expense = history.expense + :expense";
         }
@@ -108,8 +101,7 @@ class transactionsRepo {
           UpdateExpression: setExpression,
           ExpressionAttributeValues: attriButesValues,
           ReturnValues: 'UPDATED_NEW',
-        };
-        //resolve(dashParams);
+        };        
         dynamoClient.update(dashParams, function (err, data) {
           if (err) {
             reject({ "status": "fail", "reason": err })
@@ -125,23 +117,22 @@ class transactionsRepo {
     return new Promise((resolve, reject) => {             
         
         let dashboard = {
-          personId: transaction.personId               
+          personId: transaction.personId,
+          history:{
+            credits: 0,
+            debits : 0,
+            expense: 0
+          }          
         };
 
         let trType = util.getDashboardType(transaction.type);     
                 
         if(trType === dashBoard.credit){          
-          dashboard.history = {
-            credits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
-          }          
+          dashboard.history.credits = util.getDashboardTypeAmount(transaction.type,transaction.amount)          
         }else if(trType === dashBoard.debit){
-          dashboard.history = {
-            debits : util.getDashboardTypeAmount(transaction.type,transaction.amount)
-          };
+          dashboard.history = util.getDashboardTypeAmount(transaction.type,transaction.amount)          
         }else if(trType === dashBoard.expense){
-          dashboard.history = {
-            expense : util.getDashboardTypeAmount(transaction.type,transaction.amount)
-          }
+          dashboard.history = util.getDashboardTypeAmount(transaction.type,transaction.amount)          
         }
         
         let dashParams = {
@@ -188,8 +179,7 @@ class transactionsRepo {
      
   addMultipleTransactions(transactions) {
     return new Promise((resolve, reject) => {
-      let addedTransactions = []; let promises = [];
-      //resolve("added multiple");
+      let addedTransactions = []; let promises = [];      
       transactions.forEach(transaction => {
         promises.push(this.addNewTransaction(transaction).then(data => {
           addedTransactions.push(data);
