@@ -11,11 +11,25 @@ const {dashBoard} = config;
 
 class transactionsRepo {
   GetDashBoardInfo(personsId) {
-    let dashBoradInfo = [];
+    let dashBoardInfo = {
+      board:{
+        credits:0,
+        debits:0,
+        expense:0
+      }      
+    };
     let dashBoardRecords = await this.getDashBoardParams();
     let persons = await personrepo.getPersonsById(personsId);
     if(dashBoardRecords.Count > 0){
-      
+      dashBoardRecords.Items.forEach(board => {
+            if(board.history.credits > board.history.debits){
+
+            }
+            dashBoardInfo.board.credits = dashBoardInfo.board.credits + board.history.credits;
+            dashBoardInfo.board.debits = dashBoardInfo.board.debits + board.history.debits;
+            dashBoardInfo.board.expense = dashBoardInfo.board.expense + board.history.expense;
+
+      });
     }
   }
   getTransactionsByPersonId(transactionId,LastEvaluatedKey = null) {
