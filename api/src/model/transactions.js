@@ -5,26 +5,34 @@ import { tables } from "../database/schema";
 import uuid from "uuid/v1";
 import util from "../helpers/utility";
 import config from "../config";
+import personrepo from './person';
 
 const {dashBoard} = config;
 
 class transactionsRepo {
-  GetDashBoardInfo() {
-
+  GetDashBoardInfo(personsId) {
+    let dashBoradInfo = [];
+    let dashBoardRecords = await this.getDashBoardParams();
+    let persons = await personrepo.getPersonsById(personsId);
+    if(dashBoardRecords.Count > 0){
+      
+    }
   }
   getTransactionsByPersonId(transactionId,LastEvaluatedKey = null) {
     return new Promise((resolve, reject) => {
       let getParams = this.getParamsForDb(transactionId,LastEvaluatedKey);
-      //resolve(getParams);
+      let transactions = [];
       dynamoClient.query(getParams, function (err, data) {
         if (err) {
           reject(err);
         } else {
           if(data.LastEvaluatedKey){
+            transactions.push(data);
             getTransactionsByPersonId(transactionId,LastEvaluatedKey)
           }
           else{
-            resolve(data);
+            transactions.push(data);
+            resolve(transactions);
           }
         }
       });
@@ -289,6 +297,32 @@ class transactionsRepo {
     };
 
     return params;
+  }
+
+  getDashBoardParams(LastEvaluatedKey = null) {
+    return new Promise((resolve, reject) => {
+      let dashBoardRecords = [];
+      let dashparams = {
+        TableName: 'dashboard',
+      }
+      if(dashparams){
+        dashparams.ExclusiveStartKey = LastEvaluatedKey;
+      }
+       dynamoClient.scan(dashparams, function (err, data) {
+       if(err){
+          reject(err);
+        }else{
+          if(data.LastEvaluatedKey){
+            dashBoardRecords.push(data);
+            getDashBoardParams(LastEvaluatedKey);
+          }
+          else{
+            dashBoardRecords.push(data);
+            resolve(dashBoardRecords);
+          }
+        }
+      });
+    });
   }
 
   deleteParams(deletePerson) {

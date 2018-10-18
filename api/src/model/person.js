@@ -4,14 +4,22 @@ import uuid from "uuid/v1";
 
 class personRepo {
 
-    getPersonsById(personId){
+    getPersonsById(personId,LastEvaluatedKey = null){
        return new Promise((resolve,reject) => {
-            let getParams = this.getParamsForDb(personId);            
+           let persons = [];
+            let getParams = this.getParamsForDb(personId,LastEvaluatedKey);            
             dynamoClient.query(getParams, function(err, data) {
                if(err){
                     reject(err);
                }else{
-                    resolve(data);
+                if(data.LastEvaluatedKey){
+                    persons.push(data);
+                    getPersonsById(personId,LastEvaluatedKey);
+                  }
+                  else{
+                    persons.push(data);
+                    resolve(persons);
+                  }
                }           
             });
        }); 
@@ -30,7 +38,7 @@ class personRepo {
             if(person.type && person.type === "admin"){
                 person.belongsTo = person.id;
             }else{
-                person.belongsTo = "aa9aa1d0-cf89-11e8-9fa8-59ddb6b06ef5";
+                person.belongsTo = "3c494b90-d08e-11e8-b99c-674ad6d3fa57";
             }         
             let newPerson = this.putParamsForDb(person);            
             dynamoClient.put(newPerson, function (err, data) {
