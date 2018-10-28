@@ -13,21 +13,42 @@ class transactionsRepo {
   GetDashBoardInfo(personsId) {
     let dashBoardInfo = {
       board:{
+        person:{},
         credits:0,
         debits:0,
         expense:0
-      }      
+      },
+      person:{
+
+      }
     };
     let dashBoardRecords = await this.getDashBoardParams();
     let persons = await personrepo.getPersonsById(personsId);
     if(dashBoardRecords.Count > 0){
       dashBoardRecords.Items.forEach(board => {
-            if(board.history.credits > board.history.debits){
+            
+            board.person.id = board.personId;
+            board.person.name = persons.filter((person,index) => { 
+                  if(person.personId == board.personId){
+                    return person.name;
+                  }
+            });
 
+            if(board.history.credits < board.history.debits){                
+                dashBoardInfo.board.debits = dashBoardInfo.board.debits + (board.history.debits - board.history.credits);
+                board.person.debits = board.history.debits - board.history.credits;
             }
-            dashBoardInfo.board.credits = dashBoardInfo.board.credits + board.history.credits;
-            dashBoardInfo.board.debits = dashBoardInfo.board.debits + board.history.debits;
-            dashBoardInfo.board.expense = dashBoardInfo.board.expense + board.history.expense;
+            else if(board.history.credits == board.history.debits){
+                dashBoardInfo.board.credits = dashBoardInfo.board.credits + 0;
+                dashBoardInfo.board.debits = dashBoardInfo.board.debits + 0;
+                board.person.debits = 0;
+                board.person.credits = 0;
+            }
+            else{
+                dashBoardInfo.board.credits = dashBoardInfo.board.credits + board.history.credits;
+                dashBoardInfo.board.debits = dashBoardInfo.board.debits + board.history.debits;
+                dashBoardInfo.board.expense = dashBoardInfo.board.expense + board.history.expense;
+            }
 
       });
     }
