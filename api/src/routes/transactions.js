@@ -4,12 +4,21 @@ import transaction from '../controller/transactions';
 const router = express();
 //routes for handling person related
 router.get('/:personId', function (req, res) {
-    transaction.getAllTransactions(req).then((responseData) => {
+    transaction.GetDashBoardInfo(req).then((responseData) => {
         res.json({ data: responseData });
     }).catch(err => {
         res.status(500).json({ error: err });
     });
 })
+
+// router.post('/getinfo/', function (req, res) {        
+//     transaction.GetDashBoardInfo(req).then((responseData) => {
+//         res.json({ data: responseData });
+//     }).catch(err => {
+//         res.status(500).json({ error: err });
+//     });
+// });
+
 
 router.post('/', function (req, res) {    
     transaction.addTransaction(req).then((responseData) => {

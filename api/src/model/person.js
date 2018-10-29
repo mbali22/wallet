@@ -38,7 +38,7 @@ class personRepo {
             if(person.type && person.type === "admin"){
                 person.belongsTo = person.id;
             }else{
-                person.belongsTo = "3c494b90-d08e-11e8-b99c-674ad6d3fa57";
+                person.belongsTo = "855e1fb0-da05-11e8-b33b-bd3d142da43b";
             }         
             let newPerson = this.putParamsForDb(person);            
             dynamoClient.put(newPerson, function (err, data) {

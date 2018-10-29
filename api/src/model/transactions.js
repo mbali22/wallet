@@ -10,22 +10,23 @@ import personrepo from './person';
 const {dashBoard} = config;
 
 class transactionsRepo {
-  GetDashBoardInfo(personsId) {
+  async GetDashBoardInfo(personsId) {
     let dashBoardInfo = {
       board:{
         person:{},
         credits:0,
         debits:0,
         expense:0
-      },
-      person:{
-
       }
     };
+
     let dashBoardRecords = await this.getDashBoardParams();
-    let persons = await personrepo.getPersonsById(personsId);
-    if(dashBoardRecords.Count > 0){
+    let persons = await personrepo.getPersonsById(personsId);    
+    console.log(dashBoardRecords);
+    if(dashBoardRecords && dashBoardRecords.Count > 0){    
+      console.log('insideee');
       dashBoardRecords.Items.forEach(board => {
+            console.log(board);
             
             board.person.id = board.personId;
             board.person.name = persons.filter((person,index) => { 
@@ -48,10 +49,15 @@ class transactionsRepo {
                 dashBoardInfo.board.credits = dashBoardInfo.board.credits + board.history.credits;
                 dashBoardInfo.board.debits = dashBoardInfo.board.debits + board.history.debits;
                 dashBoardInfo.board.expense = dashBoardInfo.board.expense + board.history.expense;
+
+                board.person.debits =  board.history.debits;
+                board.person.credits = board.history.credit;
+                board.person.expense = board.history.expense;
             }
 
       });
     }
+    return dashBoardInfo;
   }
   getTransactionsByPersonId(transactionId,LastEvaluatedKey = null) {
     return new Promise((resolve, reject) => {
