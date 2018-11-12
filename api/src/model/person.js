@@ -18,7 +18,7 @@ class personRepo {
                   }
                   else{
                     persons.push(data);
-                    resolve(persons);
+                    resolve(persons[0]);
                   }
                }           
             });
