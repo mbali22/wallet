@@ -26,11 +26,8 @@ class transactionsRepo {
       dashBoardRecords.Items.forEach(board => {  
             let person = {};
             person.id = board.personId;            
-            person.name = persons.Items.filter((prsn,index) => {                      
-                if(prsn.id === board.history.personId){
-                  return person.name;
-                }
-            });
+            let sPerson = persons.Items.filter(p => p.id === board.personId)[0]
+            person.name = sPerson.fname + " " + sPerson.lname;
             
             if(board.history.credits < board.history.debits){                
                 debits = debits + (board.history.debits - board.history.credits);
