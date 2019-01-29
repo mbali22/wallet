@@ -82,7 +82,7 @@ class transactionsRepo {
 
   
   async addNewTransaction(transaction) {       
-    let trResponse = await this.insertTransaction(transaction);        
+    let trResponse = await this.insertTransaction(transaction);           
     if(trResponse && trResponse.status === "success"){      
       let infoExist = await this.dashboardInfoExist(trResponse.newTransaction);         
       if(infoExist && infoExist.Count == 0){            
@@ -97,16 +97,17 @@ class transactionsRepo {
 
   insertTransaction(transaction) {
     return new Promise((resolve, reject) => {            
-      let newTransaction = this.putParamsForDb(transaction);        
-      dynamoClient.put(newTransaction, function (err, data) {
-        if (err) {          
-          err.status = "failed";
-          reject(err);
-        }
-        else {             
-          resolve({"status":"success","newTransaction": newTransaction.Item});
-        }
-      });
+      let newTransaction = this.putParamsForDb(transaction);  
+      resolve(newTransaction);
+      // dynamoClient.put(newTransaction, function (err, data) {
+      //   if (err) {          
+      //     err.status = "failed";
+      //     reject(err);
+      //   }
+      //   else {             
+      //     resolve({"status":"success","newTransaction": newTransaction.Item});
+      //   }
+      // });
     });
   }
 
@@ -204,10 +205,12 @@ class transactionsRepo {
         TableName: tables["dashboard"],
         KeyConditionExpression: '#whose = :value',
         ExpressionAttributeNames: {
-          '#whose': 'personId'
+          '#whose': 'personid',
+          '#userid':'userid'
         },
         ExpressionAttributeValues: {
-          ':value': transaction.personId
+          ':value': transaction.personId,
+          ':userid': transaction.userid
         }
       };
       
@@ -260,7 +263,7 @@ class transactionsRepo {
         }
       });
     });
-}
+  }
 
 
   DeleteTransaction(transation) {
@@ -279,24 +282,24 @@ class transactionsRepo {
     var params = {
       TableName: tables["transactions"],
       Item: transaction,
-      ConditionExpression: 'attribute_not_exists(id)',
+      ConditionExpression: 'attribute_not_exists(id) AND attribute_not_exists(date)',
       ReturnValues: 'ALL_OLD',
     };
     return params;
   }
 
-  getParamsForDb(transactionId,LastEvaluatedKey) {
+  getParamsForDb(personid,userid,LastEvaluatedKey) {
     var params = {
-      TableName: tables["transactions"],
+      TableName: tables["transactions"],      
       IndexName: tables["IdxPersonTransactions"],
       KeyConditionExpression: '#whose = :value',
       ExpressionAttributeNames: {
         '#whose': 'personId'
       },
       ExpressionAttributeValues: {
-        ':value': transactionId
+        ':value': personid
       },
-      ScanIndexForward:false
+      ScanIndexForward:false      
     };
     if(LastEvaluatedKey){
       params.ExclusiveStartKey = LastEvaluatedKey;
@@ -315,9 +318,9 @@ class transactionsRepo {
     var params = {
       TableName: tables["transactions"],
       Key: {
-        "id": transaction.id
+        "id": transaction.id        
       },
-      UpdateExpression: 'SET amount = :amount, #type = :type, reason = :reason, modifiedDate = :modifiedDate, personId = :personId',
+      UpdateExpression: 'SET amount = :amount, #type = :type, reason = :reason, modifiedDate = :modifiedDate, personid = :personid',
       ConditionExpression: 'attribute_exists(id)',
       ExpressionAttributeNames:{
         "#type":"type"
@@ -327,7 +330,7 @@ class transactionsRepo {
         ":type": transaction.type,
         ":reason": transaction.reason,
         ":modifiedDate":transaction.modifiedDate,
-        ":personId":transaction.personId
+        ":personId":transaction.personId      
       },
       ReturnValues: 'UPDATED_NEW',
     };
@@ -361,20 +364,17 @@ class transactionsRepo {
     });
   }
 
-  deleteParams(deletePerson) {
+  deleteParams(transactionid) {
     var params = {
-      TableName: tables["persons"],
-      Key: {
-        "belongsTo": deletePerson.belongsTo,
-        "id": deletePerson.id
+      TableName: tables["transactions"],
+      Key: {        
+        "id": transactionid
       },
-      ConditionExpression: 'attribute_exists(belongsTo) AND attribute_exists(id)',
+      ConditionExpression: 'attribute_exists(id)',
       ReturnValues: 'NONE',
     };
     return params;
   }
-
-
 
 }
 

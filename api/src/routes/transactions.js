@@ -5,7 +5,7 @@ const router = express();
 //routes for handling person related
 router.get('/:personId', function (req, res) {
     transaction.GetDashBoardInfo(req).then((responseData) => {
-        res.json({ data: responseData });
+        res.json(responseData);
     }).catch(err => {
         res.status(500).json({ error: err });
     });

@@ -9,26 +9,30 @@ const tables = {
 }
 const tableSchemas = 
     {
-    "dashboard":{
-            TableName: tables["dashboard"],
-            KeySchema: [
-                {AttributeName: "personId", KeyType: "HASH"}            
-            ],
-            AttributeDefinitions: [
-                { AttributeName: "personId",AttributeType: "S"}            
-            ],
-            ProvisionedThroughput: {
-                ReadCapacityUnits: 10,WriteCapacityUnits: 10
-            }
-        },
+    // "dashboard":{
+    //         TableName: tables["dashboard"],
+    //         KeySchema: [
+    //             {AttributeName: "userid", KeyType: "HASH"},                  
+    //             {AttributeName: "personid", KeyType: "RANGE"}
+    //         ],
+    //         AttributeDefinitions: [
+    //             { AttributeName: "userid",AttributeType: "S"},            
+    //             { AttributeName: "personid",AttributeType: "S"}
+    //         ],
+    //         ProvisionedThroughput: {
+    //             ReadCapacityUnits: 10,WriteCapacityUnits: 10
+    //         }
+    //     },
     "transactions": {
         TableName: tables["transactions"],
         KeySchema: [
-            { AttributeName: "id", KeyType: "HASH"}            
+            {AttributeName: "id", KeyType: "HASH"},
+            {AttributeName: "date", KeyType: "RANGE"}
         ],
         AttributeDefinitions: [
+            //{AttributeName: "id", AttributeType: "S"},
+            // {AttributeName: "userid", AttributeType: "S"},
             {AttributeName: "id", AttributeType: "S"},
-            {AttributeName: "personId", AttributeType: "S"},
             {AttributeName: "date", AttributeType: "S"}
         ],
         ProvisionedThroughput: {
@@ -47,35 +51,35 @@ const tableSchemas =
                 ReadCapacityUnits: 10,
                 WriteCapacityUnits: 10
             }
-        }]
+        }]       
     },
     //master Tables
-    "transactionTypes":{
-        TableName: tables["transactionTypes"],
-        KeySchema: [
-            {AttributeName: "id", KeyType: "HASH"}  
-        ],
-        AttributeDefinitions: [
-            { AttributeName: "id",AttributeType: "N"}
-        ],
-        ProvisionedThroughput: {
-            ReadCapacityUnits: 10,WriteCapacityUnits: 10
-        }
-    },
-    "persons":{
-        TableName: tables["persons"],
-        KeySchema: [
-            {AttributeName: "belongsTo", KeyType: "HASH"},
-            {AttributeName: "id",KeyType: "RANGE"}
-        ],
-        AttributeDefinitions: [
-            { AttributeName: "belongsTo",AttributeType: "S"},
-            { AttributeName: "id",AttributeType: "S"}            
-        ],
-        ProvisionedThroughput: {
-            ReadCapacityUnits: 10,WriteCapacityUnits: 10
-        }
-    },
+    // "transactionTypes":{
+    //     TableName: tables["transactionTypes"],
+    //     KeySchema: [
+    //         {AttributeName: "id", KeyType: "HASH"}  
+    //     ],
+    //     AttributeDefinitions: [
+    //         { AttributeName: "id",AttributeType: "N"}
+    //     ],
+    //     ProvisionedThroughput: {
+    //         ReadCapacityUnits: 10,WriteCapacityUnits: 10
+    //     }
+    // },
+    // "persons":{
+    //     TableName: tables["persons"],
+    //     KeySchema: [
+    //         {AttributeName: "userid", KeyType: "HASH"},
+    //         {AttributeName: "id",KeyType: "RANGE"}
+    //     ],
+    //     AttributeDefinitions: [
+    //         { AttributeName: "userid",AttributeType: "S"},
+    //         { AttributeName: "id",AttributeType: "S"}            
+    //     ],
+    //     ProvisionedThroughput: {
+    //         ReadCapacityUnits: 10,WriteCapacityUnits: 10
+    //     }
+    // }
     
 };
 
@@ -83,7 +87,7 @@ function createDBScehma() {
     return new Promise((resolve, reject) => {
         let promises= []; let tableResults = [];
         //resolve(Object.keys(tables));                    
-        Object.keys(tables).forEach((table) => {            
+        Object.keys(tables).forEach((table) => {                 
             promises.push(
                 createDynamoDBTable(table).then(data => {
                     tableResults.push(data);

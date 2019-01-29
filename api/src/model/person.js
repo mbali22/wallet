@@ -4,17 +4,17 @@ import uuid from "uuid/v1";
 
 class personRepo {
 
-    getPersonsById(personId,LastEvaluatedKey = null){
+    getPersonsById(userid,LastEvaluatedKey = null){        
        return new Promise((resolve,reject) => {
            let persons = [];
-            let getParams = this.getParamsForDb(personId,LastEvaluatedKey);            
-            dynamoClient.query(getParams, function(err, data) {
+            let getParams = this.getParamsForDb(userid,LastEvaluatedKey);            
+            dynamoClient.query(getParams, function(err, data) {               
                if(err){
                     reject(err);
-               }else{
+               }else{                
                 if(data.LastEvaluatedKey){
                     persons.push(data);
-                    getPersonsById(personId,LastEvaluatedKey);
+                    getPersonsById(userid,LastEvaluatedKey);
                   }
                   else{
                     persons.push(data);
@@ -35,12 +35,12 @@ class personRepo {
         return new Promise((resolve, reject) => {
             person.id = uuid();
             
-            if(person.type && person.type === "admin"){
-                person.belongsTo = person.id;
+            if(person && person.type === "admin"){
+                person.userid = "222";
             }else{
-                person.belongsTo = "855e1fb0-da05-11e8-b33b-bd3d142da43b";
-            }         
-            let newPerson = this.putParamsForDb(person);            
+                person.userid = "222";
+            }
+            let newPerson = this.putParamsForDb(person);   
             dynamoClient.put(newPerson, function (err, data) {
                 if (err) {
                     err.status = "failed";
@@ -117,21 +117,21 @@ class personRepo {
         var params = {
             TableName: tables["persons"],
             Item:person,
-            ConditionExpression: 'attribute_not_exists(belongsTo) AND attribute_not_exists(id)',           
+            ConditionExpression: 'attribute_not_exists(userid) AND attribute_not_exists(id)',           
             ReturnValues: 'ALL_OLD', // optional (NONE | ALL_OLD)
         };
         return params;
     }
 
-    getParamsForDb(personId){
+    getParamsForDb(userid){
         var params = {
             TableName: tables["persons"],
             KeyConditionExpression: '#whose = :value', 
             ExpressionAttributeNames: {
-                '#whose': 'belongsTo'
+                '#whose': 'userid'
             },
             ExpressionAttributeValues: { // a map of substitutions for all attribute values
-              ':value': personId
+              ':value': userid
             }
         };
         return params;
@@ -141,11 +141,11 @@ class personRepo {
         var params = {
             TableName:  tables["persons"],
             Key: { 
-                "belongsTo": person.belongsTo,
+                "userid": person.userid,
                 "id":person.id
             },
             UpdateExpression: 'SET fname = :fname, lname = :lname, Mobile = :Mobile',
-            ConditionExpression: 'attribute_exists(belongsTo) AND attribute_exists(id)',             
+            ConditionExpression: 'attribute_exists(userid) AND attribute_exists(id)',             
             ExpressionAttributeValues: { 
                 ":lname": person.lname,
                 ":fname":person.fname,
@@ -161,7 +161,7 @@ class personRepo {
         var params = {
             TableName:  tables["persons"],
             Key: { 
-                "belongsTo": deletePerson.belongsTo,
+                "userid": deletePerson.belongsTo,
                 "id":deletePerson.id
             },            
             ConditionExpression: 'attribute_exists(belongsTo) AND attribute_exists(id)',           

@@ -21,64 +21,56 @@ const defaultData = {
         },
         {
             "id": 5,
-            "value": "transaction"
+            "value": "expense"
         }
     ],
     "persons":[
         {            
             "fname":"Sanjay",
             "lname":"Dc",
-            "Mobile":"9741732305",
-            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
+            "Mobile":"9741732305"            
         },
         {
           
             "fname":"Harish", 
             "lname":"Rasalkar",
-            "Mobile":"9449543777",
-            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
+            "Mobile":"9449543777"
         },
         {
            
             "fname":"Sandeep",
             "lname":"Bhavikatti",            
-            "Mobile":"919740515544",
-            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
+            "Mobile":"919740515544"
         },
         {
            
             "fname":"Pradeep",
             "lname":"Hotti",
-            "Mobile":"9448538916",
-            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
+            "Mobile":"9448538916"
         },
         {
            
             "fname":"ShahiKumar",
             "lname":"MS",
-            "Mobile":"9980256827",
-            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
+            "Mobile":"9980256827"
         },
         {
            
             "fname":"Sharanaiah",
             "lname":"Hiremath",
-            "Mobile":"7406627780",
-            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
+            "Mobile":"7406627780"
         },
         {
            
             "fname":"Subhash",
             "lname":"Patil",
-            "Mobile":"9964460038",
-            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
+            "Mobile":"9964460038"
         },
         {
            
             "fname":"Iliyaz",
             "lname":"a",
-            "Mobile":"9620150622",
-            "belongsTo":"4e2ec860-c0e6-11e8-b8ad-9f77c8081c2f"
+            "Mobile":"9620150622"
         },
         {
            
