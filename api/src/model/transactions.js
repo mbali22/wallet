@@ -82,9 +82,9 @@ class transactionsRepo {
 
   
   async addNewTransaction(transaction) {       
-    let trResponse = await this.insertTransaction(transaction);           
+    let trResponse = await this.insertTransaction(transaction);            
     if(trResponse && trResponse.status === "success"){      
-      let infoExist = await this.dashboardInfoExist(trResponse.newTransaction);         
+      let infoExist = await this.dashboardInfoExist(trResponse.newTransaction);               
       if(infoExist && infoExist.Count == 0){            
           let newDashBoardInfo = await this.addDashboardInfo(trResponse.newTransaction);
           return newDashBoardInfo;
@@ -97,17 +97,16 @@ class transactionsRepo {
 
   insertTransaction(transaction) {
     return new Promise((resolve, reject) => {            
-      let newTransaction = this.putParamsForDb(transaction);  
-      resolve(newTransaction);
-      // dynamoClient.put(newTransaction, function (err, data) {
-      //   if (err) {          
-      //     err.status = "failed";
-      //     reject(err);
-      //   }
-      //   else {             
-      //     resolve({"status":"success","newTransaction": newTransaction.Item});
-      //   }
-      // });
+      let newTransaction = this.putParamsForDb(transaction);        
+      dynamoClient.put(newTransaction, function (err, data) {
+        if (err) {          
+          err.status = "failed";
+          reject(err);
+        }
+        else {             
+          resolve({"status":"success","newTransaction": newTransaction.Item});
+        }
+      });
     });
   }
 
@@ -115,7 +114,8 @@ class transactionsRepo {
     return new Promise((resolve,reject) => {
         let attriButesValues = {}; let setExpression = 'SET';
         let dashboard = {
-          personId: transaction.personId,
+          userid:transaction.userid,
+          personid: transaction.personid,
           history:{
             credits: 0,
             debits : 0,
@@ -141,8 +141,10 @@ class transactionsRepo {
         let dashParams = {
           TableName: tables["dashboard"],
           Key: {
-            "personId": dashboard.personId,
+            "userid": dashboard.userid,
+            "personid":dashboard.personid
           },
+          
           UpdateExpression: setExpression,
           ExpressionAttributeValues: attriButesValues,
           ReturnValues: 'UPDATED_NEW',
@@ -159,15 +161,15 @@ class transactionsRepo {
   }
 
   addDashboardInfo(transaction) {
-    return new Promise((resolve, reject) => {             
-        
+    return new Promise((resolve, reject) => {   
         let dashboard = {
-          personId: transaction.personId,
+          userid:transaction.userid,
+          personId: transaction.personid,
           history:{
             credits: 0,
             debits : 0,
             expense: 0
-          }          
+          }       
         };
 
         let trType = util.getDashboardType(transaction.type);     
@@ -179,11 +181,11 @@ class transactionsRepo {
         }else if(trType === dashBoard.expense){
           dashboard.history = util.getDashboardTypeAmount(transaction.type,transaction.amount)          
         }
-        
+        resolve(dashboard);
         let dashParams = {
           TableName: tables["dashboard"],
           Item:dashboard,
-          ConditionExpression: 'attribute_not_exists(personId)',
+          ConditionExpression: 'attribute_not_exists(userid) and attribute_not_exists(personid)',
           ReturnValues: 'ALL_OLD',
         };    
         
@@ -203,24 +205,18 @@ class transactionsRepo {
       
       let dashboardInfoExist = {
         TableName: tables["dashboard"],
-        KeyConditionExpression: '#whose = :value',
-        ExpressionAttributeNames: {
-          '#whose': 'personid',
-          '#userid':'userid'
-        },
-        ExpressionAttributeValues: {
-          ':value': transaction.personId,
+        KeyConditionExpression: '#userid = :userid',        
+        ExpressionAttributeValues: {          
           ':userid': transaction.userid
         }
-      };
-      
+      };      
       dynamoClient.query(dashboardInfoExist, function (err, data) {
         if (err) {
           reject(err);
         } else {
           resolve(data);
         }
-      });22
+      });
     });
   }
      
@@ -282,7 +278,10 @@ class transactionsRepo {
     var params = {
       TableName: tables["transactions"],
       Item: transaction,
-      ConditionExpression: 'attribute_not_exists(id) AND attribute_not_exists(date)',
+      ConditionExpression: 'attribute_not_exists(id) AND attribute_not_exists(#date)',
+      ExpressionAttributeNames:{
+        "#date":'date'
+      },
       ReturnValues: 'ALL_OLD',
     };
     return params;
