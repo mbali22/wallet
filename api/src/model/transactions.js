@@ -111,7 +111,7 @@ class transactionsRepo {
   }
 
   updateDashBoardInfo(transaction){    
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve,reject) => {      
         let attriButesValues = {}; let setExpression = 'SET';
         let dashboard = {
           userid:transaction.userid,
@@ -144,11 +144,11 @@ class transactionsRepo {
             "userid": dashboard.userid,
             "personid":dashboard.personid
           },
-          
           UpdateExpression: setExpression,
           ExpressionAttributeValues: attriButesValues,
-          ReturnValues: 'UPDATED_NEW',
+          ReturnValues: 'ALL_NEW',
         };        
+        resolve(dashParams);
         dynamoClient.update(dashParams, function (err, data) {
           if (err) {
             reject({ "status": "fail", "reason": err })
@@ -235,28 +235,23 @@ class transactionsRepo {
         resolve(addedTransactions);
       });
     });
-  }
-
-  async updateTransactonDetails(transaction){
-    let uTrDetails = await UpdateTransaction(transaction);
-    let uDashInfo;
-    if(uTrDetails && uTrDetails.status === "success"){
-      uDashInfo = this.updateDashBoardInfo(uTrDetails.updatedTransaction)
-    }
-    return uDashInfo;
-  }
+  } 
   
-  UpdateTransaction(transaction) {
+ async UpdateTransaction(transaction) {
+    let utransaction = await this.updatePersonTransaction(transaction);    
+    return await this.updateDashBoardInfo(utransaction);
+ }
+
+  updatePersonTransaction(transaction){
     return new Promise((resolve, reject) => {
-      let uTr = this.updateParamsForDb(transaction);      
+      let uTr = this.updateParamsForDb(transaction);          
       dynamoClient.update(uTr, function (err, data) {
         if (err) {
           err.status = "failed";
-          reject(err);
+          reject(err);          
         }
-        else {    
-          let upTransaction = this.updateDashBoardInfo(data.Attributes)
-          resolve(upTransaction);        
+        else {                 
+          resolve(data.Attributes);
         }
       });
     });
@@ -307,7 +302,7 @@ class transactionsRepo {
     return params;
   }
 
-  updateParamsForDb(transaction) {
+  updateParamsForDb(transaction) {    
     
     if(transaction){      
       transaction.modifiedDate = util.FormatToISO8601(new Date());
@@ -318,10 +313,10 @@ class transactionsRepo {
     var params = {
       TableName: tables["transactions"],
       Key: {
-        "id": transaction.id        
+        "id": transaction.id,
+        "date":transaction.date
       },
-      UpdateExpression: 'SET amount = :amount, #type = :type, reason = :reason, modifiedDate = :modifiedDate, personid = :personid',
-      ConditionExpression: 'attribute_exists(id)',
+      UpdateExpression: 'SET amount = :amount, #type = :type, reason = :reason, modifiedDate = :modifiedDate, personid = :personid',      
       ExpressionAttributeNames:{
         "#type":"type"
       },
@@ -330,9 +325,9 @@ class transactionsRepo {
         ":type": transaction.type,
         ":reason": transaction.reason,
         ":modifiedDate":transaction.modifiedDate,
-        ":personId":transaction.personId      
+        ":personid":transaction.personid      
       },
-      ReturnValues: 'UPDATED_NEW',
+      ReturnValues: 'ALL_NEW',
     };
 
     return params;
