@@ -273,11 +273,7 @@ class transactionsRepo {
     }
     var params = {
       TableName: tables["transactions"],
-      Item: transaction,
-      ConditionExpression: 'attribute_not_exists(id) AND attribute_not_exists(#date)',
-      ExpressionAttributeNames:{
-        "#date":'date'
-      },
+      Item: transaction,     
       ReturnValues: 'ALL_OLD',
     };
     return params;
@@ -313,8 +309,7 @@ class transactionsRepo {
     var params = {
       TableName: tables["transactions"],
       Key: {
-        "id": transaction.id,
-        "date":transaction.date
+        "id": transaction.id        
       },
       UpdateExpression: 'SET amount = :amount, #type = :type, reason = :reason, modifiedDate = :modifiedDate, personid = :personid',      
       ExpressionAttributeNames:{
@@ -364,8 +359,7 @@ class transactionsRepo {
       TableName: tables["transactions"],
       Key: {        
         "id": transactionid
-      },
-      ConditionExpression: 'attribute_exists(id)',
+      },      
       ReturnValues: 'NONE',
     };
     return params;

@@ -26,8 +26,7 @@ const tableSchemas =
     "transactions": {
         TableName: tables["transactions"],
         KeySchema: [
-            {AttributeName: "id", KeyType: "HASH"},
-            {AttributeName: "date", KeyType: "RANGE"}
+            {AttributeName: "id", KeyType: "HASH"}            
         ],
         AttributeDefinitions: [
             //{AttributeName: "id", AttributeType: "S"},
