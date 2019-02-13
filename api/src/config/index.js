@@ -11,4 +11,4 @@ export default {
     "debit":2,
     "expense":3
   }
-  }
+}

@@ -10,8 +10,8 @@ class transactionController {
   }
 
   async GetDashBoardInfo(req){
-        let personId = req.params.personId;        
-        let info = await transactionRepo.GetDashBoardInfo(personId);
+        let personId = req.params.userid;        
+        let info = await transactionRepo.GetDashBoardInfo(userid);
         return info;
   }
   async addTransaction(req) {   

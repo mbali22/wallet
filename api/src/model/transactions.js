@@ -111,7 +111,7 @@ class transactionsRepo {
   }
 
   updateDashBoardInfo(transaction){    
-    return new Promise((resolve,reject) => {      
+    return new Promise((resolve,reject) => {            
         let attriButesValues = {}; let setExpression = 'SET';
         let dashboard = {
           userid:transaction.userid,
@@ -147,8 +147,7 @@ class transactionsRepo {
           UpdateExpression: setExpression,
           ExpressionAttributeValues: attriButesValues,
           ReturnValues: 'ALL_NEW',
-        };        
-        resolve(dashParams);
+        };                
         dynamoClient.update(dashParams, function (err, data) {
           if (err) {
             reject({ "status": "fail", "reason": err })
@@ -238,19 +237,19 @@ class transactionsRepo {
   } 
   
  async UpdateTransaction(transaction) {
-    let utransaction = await this.updatePersonTransaction(transaction);    
+    let utransaction = await this.updatePersonTransaction(transaction);       
     return await this.updateDashBoardInfo(utransaction);
  }
 
   updatePersonTransaction(transaction){
     return new Promise((resolve, reject) => {
-      let uTr = this.updateParamsForDb(transaction);          
+      let uTr = this.updateParamsForDb(transaction);      
       dynamoClient.update(uTr, function (err, data) {
         if (err) {
           err.status = "failed";
           reject(err);          
         }
-        else {                 
+        else {                           
           resolve(data.Attributes);
         }
       });
@@ -320,7 +319,7 @@ class transactionsRepo {
         ":type": transaction.type,
         ":reason": transaction.reason,
         ":modifiedDate":transaction.modifiedDate,
-        ":personid":transaction.personid      
+        ":personid":transaction.personid
       },
       ReturnValues: 'ALL_NEW',
     };
@@ -328,28 +327,32 @@ class transactionsRepo {
     return params;
   }
 
-  getDashBoardParams(LastEvaluatedKey = null) {
+  getDashBoardParams(userid,LastEvaluatedKey = null) {
     return new Promise((resolve, reject) => {
-      let dashBoardRecords = [];
-      let dashparams = {
-        TableName: 'dashboard',
-      }
-      if(dashparams){
-        dashparams.ExclusiveStartKey = LastEvaluatedKey;
-      }
-       dynamoClient.scan(dashparams, function (err, data) {
-       if(err){
-          reject(err);
-        }else{
-          if(data.LastEvaluatedKey){
-            dashBoardRecords.push(data);
-            getDashBoardParams(LastEvaluatedKey);
-          }
-          else{
-            dashBoardRecords.push(data);
-            resolve(dashBoardRecords[0]);
-          }
+      let dashBoard = [];
+      let getParams = {
+        TableName: tables["dashboard"],
+        KeyConditionExpression: '#whose = :value', 
+        ExpressionAttributeNames: {
+            '#whose': 'userid'
+        },
+        ExpressionAttributeValues: { 
+          ':value': userid
         }
+      };
+      dynamoClient.query(getParams, function(err, data) {               
+         if(err){
+              reject(err);
+         }else{                
+          if(data.LastEvaluatedKey){
+              dashBoard.push(data);
+              getDashBoardParams(userid,LastEvaluatedKey);
+            }
+            else{
+              dashBoard.push(data);
+              resolve(dashBoard[0]);
+            }
+         }           
       });
     });
   }
