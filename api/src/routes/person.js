@@ -3,7 +3,7 @@ import person from '../controller/person';
 
 const router = express();
 //routes for handling person related
-router.get('/:personId', function (req, res) {
+router.get('/', function (req, res) {    
     person.getAllPersons(req).then((responseData) => {
         res.json({ data: responseData });
     }).catch(err => {

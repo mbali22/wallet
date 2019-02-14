@@ -54,17 +54,17 @@ class transactionsRepo {
     }
     return dashBoardInfo;
   }
-  getTransactionsByPersonId(transactionId,LastEvaluatedKey = null) {
+  getTransactionsByPersonId(personsid,userid,LastEvaluatedKey = null) {
     return new Promise((resolve, reject) => {
-      let getParams = this.getParamsForDb(transactionId,LastEvaluatedKey);
-      let transactions = [];
+      let getParams = this.getParamsForDb(personsid,userid,LastEvaluatedKey);
+      let transactions = [];      
       dynamoClient.query(getParams, function (err, data) {
         if (err) {
           reject(err);
         } else {
           if(data.LastEvaluatedKey){
             transactions.push(data);
-            getTransactionsByPersonId(transactionId,LastEvaluatedKey)
+            getTransactionsByPersonId(personsid,userid,LastEvaluatedKey);
           }
           else{
             transactions.push(data);
@@ -183,10 +183,8 @@ class transactionsRepo {
         let dashParams = {
           TableName: tables["dashboard"],
           Item:dashboard,
-          ConditionExpression: 'attribute_not_exists(userid) and attribute_not_exists(personid)',
           ReturnValues: 'ALL_OLD',
-        };    
-        
+        };            
 
         dynamoClient.put(dashParams, function (err, data) {
           if (err) {
@@ -282,12 +280,17 @@ class transactionsRepo {
     var params = {
       TableName: tables["transactions"],      
       IndexName: tables["IdxPersonTransactions"],
-      KeyConditionExpression: '#whose = :value',
+      KeyConditionExpression: '#personid = :personid and #date = :date',
       ExpressionAttributeNames: {
-        '#whose': 'personId'
-      },
+        '#personid': 'personid',
+        '#userid':'userid',
+        '#date':'date'
+      },      
+      FilterExpression:'#userid = :userid',
       ExpressionAttributeValues: {
-        ':value': personid
+        ':personid': personid,
+        ':userid':userid,
+        ':date':true
       },
       ScanIndexForward:false      
     };

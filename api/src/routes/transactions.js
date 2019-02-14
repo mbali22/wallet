@@ -3,7 +3,7 @@ import transaction from '../controller/transactions';
 
 const router = express();
 //routes for handling person related
-router.get('/:userid', function (req, res) {
+router.get('/', function (req, res) {
     transaction.GetDashBoardInfo(req).then((responseData) => {
         res.json(responseData);
     }).catch(err => {

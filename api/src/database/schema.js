@@ -10,12 +10,15 @@ const tables = {
 const tableSchemas = 
     {
     "dashboard":{
-            TableName: tables["dashboard"],
+            TableName: tables["dashboard"], 
             KeySchema: [
-                {AttributeName: "userid", KeyType: "HASH"}                
+                {AttributeName: "userid", KeyType: "HASH"},
+                {AttributeName: "personid", KeyType: "RANGE"}
+
             ],
             AttributeDefinitions: [
-                { AttributeName: "userid",AttributeType: "S"}                
+                { AttributeName: "userid",AttributeType: "S"},
+                { AttributeName: "personid",AttributeType: "S"}                
             ],
             ProvisionedThroughput: {
                 ReadCapacityUnits: 10,WriteCapacityUnits: 10
