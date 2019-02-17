@@ -5,7 +5,8 @@ const tables = {
     "dashboard":"dashboard",
     "transactions" : "transactions",
     "persons":"persons",
-    "transactionTypes":"transactionTypes",    
+    "transactionTypes":"transactionTypes", 
+    "IdxPersonTransactions":"IdxPersonTransactions"
 }
 const tableSchemas = 
     {

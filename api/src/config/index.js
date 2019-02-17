@@ -10,5 +10,6 @@ export default {
     "credit":1,
     "debit":2,
     "expense":3
-  }
+  },
+  "minDate":"0001-01-01T00:00:00Z"
 }

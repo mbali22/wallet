@@ -7,10 +7,10 @@ import util from "../helpers/utility";
 import config from "../config";
 import personrepo from './person';
 
-const {dashBoard} = config;
+const {dashBoard,mindate} = config;
 
 class transactionsRepo {
-  async GetDashBoardInfo(personsId) {
+  async GetDashBoardInfo(userid) {
     let dashBoardInfo = {
       personHistory:[],
       board:{
@@ -19,8 +19,8 @@ class transactionsRepo {
         expense:0
       }
     };
-    let dashBoardRecords = await this.getDashBoardParams();
-    let persons = await personrepo.getPersonsById(personsId);       
+    let dashBoardRecords = await this.getDashBoardParams(userid);
+    let persons = await personrepo.getPersonsById(userid);       
     if(dashBoardRecords && dashBoardRecords.Count > 0){  
       let credits = 0; let debits = 0; let expense = 0;        
       dashBoardRecords.Items.forEach(board => {  
@@ -56,7 +56,7 @@ class transactionsRepo {
   }
   getTransactionsByPersonId(personsid,userid,LastEvaluatedKey = null) {
     return new Promise((resolve, reject) => {
-      let getParams = this.getParamsForDb(personsid,userid,LastEvaluatedKey);
+      let getParams = this.getParamsForDb(personsid,userid,LastEvaluatedKey);      
       let transactions = [];      
       dynamoClient.query(getParams, function (err, data) {
         if (err) {
@@ -280,7 +280,7 @@ class transactionsRepo {
     var params = {
       TableName: tables["transactions"],      
       IndexName: tables["IdxPersonTransactions"],
-      KeyConditionExpression: '#personid = :personid and #date = :date',
+      KeyConditionExpression: '#personid = :personid and #date > :date',
       ExpressionAttributeNames: {
         '#personid': 'personid',
         '#userid':'userid',
@@ -290,7 +290,7 @@ class transactionsRepo {
       ExpressionAttributeValues: {
         ':personid': personid,
         ':userid':userid,
-        ':date':true
+        ':date': '0001-01-01T00:00:00Z'
       },
       ScanIndexForward:false      
     };
@@ -335,14 +335,16 @@ class transactionsRepo {
       let dashBoard = [];
       let getParams = {
         TableName: tables["dashboard"],
-        KeyConditionExpression: '#whose = :value', 
+        KeyConditionExpression: '#whose = :value or personid = :personid', 
         ExpressionAttributeNames: {
-            '#whose': 'userid'
+            '#whose': 'userid'        
         },
-        ExpressionAttributeValues: { 
-          ':value': userid
+        ExpressionAttributeValues: {
+          ':value': userid,
+          ':personid':'222'
         }
       };
+      console.log(getParams);
       dynamoClient.query(getParams, function(err, data) {               
          if(err){
               reject(err);
