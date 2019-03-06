@@ -20,15 +20,15 @@ class transactionsRepo {
       }
     };
     let dashBoardRecords = await this.getDashBoardParams(userid);
-    let persons = await personrepo.getPersonsById(userid);       
+    let persons = await personrepo.getPersonsById(userid);      
     if(dashBoardRecords && dashBoardRecords.Count > 0){  
       let credits = 0; let debits = 0; let expense = 0;        
-      dashBoardRecords.Items.forEach(board => {  
+      dashBoardRecords.Items.forEach(board => {
             let person = {};
-            person.id = board.personId;            
-            let sPerson = persons.Items.filter(p => p.id === board.personId)[0]
-            person.name = sPerson.fname + " " + sPerson.lname;
-            
+            person.id = board.personid;            
+            let sPerson = persons.Items.filter(p => p.id === board.personid)[0];            
+            person.name = sPerson.fname + " " + sPerson.lname;     
+                
             if(board.history.credits < board.history.debits){                
                 debits = debits + (board.history.debits - board.history.credits);
                 person.debits = board.history.debits - board.history.credits;
@@ -44,14 +44,12 @@ class transactionsRepo {
                 person.credits = board.history.credits - board.history.debits;                
             }
             expense = expense + board.history.expense;
-
             dashBoardInfo.personHistory.push(person);
-
       });
       dashBoardInfo.board.debits = debits;
       dashBoardInfo.board.credits = credits;
       dashBoardInfo.board.expense = expense;
-    }
+    }    
     return dashBoardInfo;
   }
   getTransactionsByPersonId(personsid,userid,LastEvaluatedKey = null) {
@@ -335,16 +333,15 @@ class transactionsRepo {
       let dashBoard = [];
       let getParams = {
         TableName: tables["dashboard"],
-        KeyConditionExpression: '#whose = :value or personid = :personid', 
+        KeyConditionExpression: '#whose = :value AND personid > :personid', 
         ExpressionAttributeNames: {
             '#whose': 'userid'        
         },
         ExpressionAttributeValues: {
           ':value': userid,
-          ':personid':'222'
+          ':personid':'1'
         }
-      };
-      console.log(getParams);
+      };      
       dynamoClient.query(getParams, function(err, data) {               
          if(err){
               reject(err);

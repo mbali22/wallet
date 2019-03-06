@@ -4,8 +4,8 @@ import personRepo from "../model/person";
 class personController {
 
     async getAllPersons(req) {        
-            let personId = req.query.personId;
-            let result =  await personRepo.getPersonsById(personId);
+            let userid = req.query.userid;            
+            let result =  await personRepo.getPersonsById(userid);
             return result;         
     }
 
